@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Bowl, Ingredient, Tab } from './types';
 import { DEFAULT_INGREDIENTS } from './data/ingredients';
+import { getOrCreateSyncCode, loadSync, saveSync } from './services/supabase';
 import BowlBuilder from './components/BowlBuilder';
 import WeekPlanner from './components/WeekPlanner';
 import RecipeBook from './components/RecipeBook';
+import SyncPanel from './components/SyncPanel';
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -32,22 +34,61 @@ const TABS: { id: Tab; label: string; emoji: string }[] = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('builder');
-  const [ingredients, setIngredients] = usePersistedState<Ingredient[]>('bowl-ingredients', DEFAULT_INGREDIENTS);
+  const [customIngredients, setCustomIngredients] = usePersistedState<Ingredient[]>('bowl-custom-ingredients', []);
+  const ingredients = [...DEFAULT_INGREDIENTS, ...customIngredients];
   const [weekPlan, setWeekPlan] = usePersistedState<Bowl[]>('bowl-week-plan', []);
   const [savedBowls, setSavedBowls] = usePersistedState<Bowl[]>('bowl-saved', []);
   const [builderKey, setBuilderKey] = useState(0);
   const [loadedBowl, setLoadedBowl] = useState<Bowl | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [syncCode, setSyncCode] = useState(() => getOrCreateSyncCode());
+  const [syncing, setSyncing] = useState(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hasApiKey = !!import.meta.env.VITE_ANTHROPIC_API_KEY;
+
+  // Load from Supabase on mount
+  useEffect(() => {
+    loadSync(syncCode).then(data => {
+      if (data) {
+        setWeekPlan(data.weekPlan);
+        setSavedBowls(data.savedBowls);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced save to Supabase whenever data changes
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      setSyncing(true);
+      await saveSync(syncCode, weekPlan, savedBowls);
+      setSyncing(false);
+    }, 1500);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  }, [syncCode, weekPlan, savedBowls]);
 
   function showNotification(msg: string) {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
   }
 
+  async function handleSwitchCode(code: string) {
+    const data = await loadSync(code);
+    if (data) {
+      localStorage.setItem('bowl-sync-code', code);
+      setSyncCode(code);
+      setWeekPlan(data.weekPlan);
+      setSavedBowls(data.savedBowls);
+      showNotification('Synced from code ' + code);
+    } else {
+      showNotification('No data found for that code');
+    }
+  }
+
   function handleAddIngredient(ing: Ingredient) {
-    setIngredients(prev => {
+    setCustomIngredients(prev => {
       if (prev.find(i => i.id === ing.id)) return prev;
       return [...prev, ing];
     });
@@ -80,7 +121,7 @@ export default function App() {
 
   function handleLoadBowl(bowl: Bowl) {
     setLoadedBowl(bowl);
-    setBuilderKey(k => k + 1); // re-mount builder with new bowl
+    setBuilderKey(k => k + 1);
     setActiveTab('builder');
     showNotification(`Loaded "${bowl.name}" into builder`);
   }
@@ -120,6 +161,8 @@ export default function App() {
                 </button>
               ))}
             </nav>
+
+            <SyncPanel syncCode={syncCode} syncing={syncing} onSwitchCode={handleSwitchCode} />
           </div>
         </div>
       </header>
