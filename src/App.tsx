@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Bowl, Ingredient, Tab } from './types';
 import { DEFAULT_INGREDIENTS } from './data/ingredients';
-import { getOrCreateSyncCode, loadSync, saveSync } from './services/supabase';
+import { supabase, getOrCreateSyncCode, loadSync, saveSync } from './services/supabase';
 import BowlBuilder from './components/BowlBuilder';
 import WeekPlanner from './components/WeekPlanner';
 import RecipeBook from './components/RecipeBook';
@@ -44,26 +44,48 @@ export default function App() {
   const [syncCode, setSyncCode] = useState(() => getOrCreateSyncCode());
   const [syncing, setSyncing] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressRemote = useRef(false);
 
   const hasApiKey = !!import.meta.env.VITE_ANTHROPIC_API_KEY;
 
-  // Load from Supabase on mount
+  // Load from Supabase on mount + subscribe to real-time changes
   useEffect(() => {
     loadSync(syncCode).then(data => {
       if (data) {
+        suppressRemote.current = true;
         setWeekPlan(data.weekPlan);
         setSavedBowls(data.savedBowls);
+        setTimeout(() => { suppressRemote.current = false; }, 2000);
       }
     });
+
+    const channel = supabase
+      .channel(`sync_${syncCode}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'sync_data',
+        filter: `sync_code=eq.${syncCode}`,
+      }, payload => {
+        if (suppressRemote.current) return;
+        const row = payload.new as { week_plan: Bowl[]; saved_bowls: Bowl[] };
+        setWeekPlan(row.week_plan ?? []);
+        setSavedBowls(row.saved_bowls ?? []);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [syncCode]);
 
   // Debounced save to Supabase whenever data changes
   useEffect(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       setSyncing(true);
+      suppressRemote.current = true;
       await saveSync(syncCode, weekPlan, savedBowls);
+      setTimeout(() => { suppressRemote.current = false; }, 2000);
       setSyncing(false);
     }, 1500);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
