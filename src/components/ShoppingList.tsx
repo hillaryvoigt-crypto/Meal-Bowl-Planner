@@ -61,7 +61,9 @@ export default function ShoppingList({ weekPlan }: Props) {
   }
 
   const items = buildShoppingList(weekPlan);
-  const leftovers = items.filter(i => i.leftoverServings > 0 && i.usedInBowls.length === 1);
+  const leftovers = items.filter(
+    i => i.leftoverServings > 0 && i.usedInBowls.length === 1 && i.ingredient.perishable !== false
+  );
 
   const byCategory = CATEGORY_ORDER.map(cat => ({
     cat,
