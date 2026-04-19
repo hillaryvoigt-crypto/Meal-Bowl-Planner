@@ -12,12 +12,15 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'carb', label: 'Carb' },
   { value: 'protein', label: 'Protein' },
   { value: 'sauce', label: 'Sauce' },
-  { value: 'topping', label: 'Topping' },
+  { value: 'fruit_veg', label: 'Fruit & Veg' },
+  { value: 'nuts_seeds', label: 'Nuts & Seeds' },
+  { value: 'cheese', label: 'Cheese' },
+  { value: 'finishing', label: 'Finishing' },
 ];
 
 export default function AddIngredientModal({ hasApiKey, onAdd, onClose }: Props) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<Category>('topping');
+  const [category, setCategory] = useState<Category>('fruit_veg');
   const [protein, setProtein] = useState('');
   const [calories, setCalories] = useState('');
   const [serving, setServing] = useState('');
@@ -101,13 +104,13 @@ export default function AddIngredientModal({ hasApiKey, onAdd, onClose }: Props)
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.value}
                   type="button"
                   onClick={() => setCategory(cat.value)}
-                  className={`flex-1 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                  className={`py-1.5 px-3 text-xs font-medium rounded-lg border transition-colors ${
                     category === cat.value
                       ? 'bg-bowl-green text-white border-bowl-green'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-bowl-green'

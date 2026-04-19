@@ -36,7 +36,7 @@ function computeCalories(
 }
 
 export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAddToWeek, onSaveBowl, onAddIngredient }: Props) {
-  const [bowlName, setBowlName] = useState(initialBowl?.name ?? 'My Bowl');
+  const [bowlName, setBowlName] = useState(initialBowl?.name ?? '');
   const [servings, setServings] = useState<1 | 2>(initialBowl?.servings ?? 2);
   const [carb, setCarb] = useState<Ingredient | null>(initialBowl?.carb ?? null);
   const [protein, setProtein] = useState<Ingredient | null>(initialBowl?.protein ?? null);
@@ -118,7 +118,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
     setSauces([]);
     setToppings([]);
     setFlavorProfile(null);
-    setBowlName('My Bowl');
+    setBowlName('');
   }
 
   const isEmpty = !carb && !protein && !sauces.length && !toppings.length;
@@ -131,7 +131,10 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
           { category: 'carb' as const, label: 'Carb', multi: false, selected: carb ? [carb.id] : [], onToggle: toggleCarb },
           { category: 'protein' as const, label: 'Protein', multi: false, selected: protein ? [protein.id] : [], onToggle: toggleProtein },
           { category: 'sauce' as const, label: 'Sauces', multi: true, selected: sauces.map(s => s.id), onToggle: toggleSauce },
-          { category: 'topping' as const, label: 'Toppings', multi: true, selected: toppings.map(t => t.id), onToggle: toggleTopping },
+          { category: 'fruit_veg' as const, label: 'Fruits & Veggies', multi: true, selected: toppings.filter(t => t.category === 'fruit_veg').map(t => t.id), onToggle: toggleTopping },
+          { category: 'nuts_seeds' as const, label: 'Nuts & Seeds', multi: true, selected: toppings.filter(t => t.category === 'nuts_seeds').map(t => t.id), onToggle: toggleTopping },
+          { category: 'cheese' as const, label: 'Cheese', multi: true, selected: toppings.filter(t => t.category === 'cheese').map(t => t.id), onToggle: toggleTopping },
+          { category: 'finishing' as const, label: 'Finishing Touches', multi: true, selected: toppings.filter(t => t.category === 'finishing').map(t => t.id), onToggle: toggleTopping },
         ].map(({ category, label, multi, selected, onToggle }) => (
           <div key={category} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -162,9 +165,10 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Bowl name</label>
             <input
-              className="w-full text-base font-semibold text-gray-900 border-0 border-b border-gray-200 pb-1 focus:outline-none focus:border-bowl-green bg-transparent"
+              className="w-full text-base font-semibold text-gray-900 border-0 border-b border-gray-200 pb-1 focus:outline-none focus:border-bowl-green bg-transparent placeholder:font-normal placeholder:text-gray-300"
               value={bowlName}
               onChange={e => setBowlName(e.target.value)}
+              placeholder="Name your bowl…"
             />
           </div>
 
@@ -212,7 +216,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
               )}
               {toppings.length > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-gray-500">Toppings</dt>
+                  <dt className="text-gray-500">Extras</dt>
                   <dd className="font-medium text-gray-800 text-right">{toppings.map(t => t.name).join(', ')}</dd>
                 </div>
               )}
