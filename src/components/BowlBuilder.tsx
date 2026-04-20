@@ -130,12 +130,12 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
         {[
           { category: 'carb' as const, label: 'Carb', multi: false, selected: carb ? [carb.id] : [], onToggle: toggleCarb },
           { category: 'protein' as const, label: 'Protein', multi: false, selected: protein ? [protein.id] : [], onToggle: toggleProtein },
+          { category: 'marinade' as const, label: 'Glazes & Marinades', multi: true, selected: toppings.filter(t => t.category === 'marinade').map(t => t.id), onToggle: toggleTopping },
           { category: 'sauce' as const, label: 'Sauces', multi: true, selected: sauces.map(s => s.id), onToggle: toggleSauce },
           { category: 'fruit_veg' as const, label: 'Fruits & Veggies', multi: true, selected: toppings.filter(t => t.category === 'fruit_veg').map(t => t.id), onToggle: toggleTopping },
           { category: 'nuts_seeds' as const, label: 'Nuts & Seeds', multi: true, selected: toppings.filter(t => t.category === 'nuts_seeds').map(t => t.id), onToggle: toggleTopping },
           { category: 'cheese' as const, label: 'Cheese', multi: true, selected: toppings.filter(t => t.category === 'cheese').map(t => t.id), onToggle: toggleTopping },
           { category: 'finishing' as const, label: 'Finishing Touches', multi: true, selected: toppings.filter(t => t.category === 'finishing').map(t => t.id), onToggle: toggleTopping },
-          { category: 'marinade' as const, label: 'Glazes & Marinades', multi: true, selected: toppings.filter(t => t.category === 'marinade').map(t => t.id), onToggle: toggleTopping },
         ].map(({ category, label, multi, selected, onToggle }) => (
           <div key={category} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-3">
