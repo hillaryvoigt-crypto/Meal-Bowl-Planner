@@ -1,37 +1,50 @@
-import type { Bowl } from '../types';
+import type { Bowl, Ingredient } from '../types';
 import { FLAVOR_COLORS } from '../data/ingredients';
+import { buildExampleBowls } from '../data/bowls';
 
 interface Props {
   savedBowls: Bowl[];
+  allIngredients: Ingredient[];
   onLoadBowl: (bowl: Bowl) => void;
   onDeleteBowl: (id: string) => void;
   onAddToWeek: (bowl: Bowl) => void;
 }
 
-export default function RecipeBook({ savedBowls, onLoadBowl, onDeleteBowl, onAddToWeek }: Props) {
-  if (savedBowls.length === 0) {
-    return (
-      <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
-        <div className="text-4xl mb-3">📖</div>
-        <p className="text-gray-500 font-medium">Your recipe book is empty</p>
-        <p className="text-sm text-gray-400 mt-1">Build a bowl you love and hit "Save to Recipe Book"</p>
-      </div>
-    );
-  }
+export default function RecipeBook({ savedBowls, allIngredients, onLoadBowl, onDeleteBowl, onAddToWeek }: Props) {
+  const exampleBowls = buildExampleBowls(allIngredients);
 
   return (
-    <div>
-      <h2 className="font-semibold text-gray-900 mb-4">Saved Bowls ({savedBowls.length})</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {savedBowls.map(bowl => (
-          <SavedBowlCard
-            key={bowl.id}
-            bowl={bowl}
-            onLoad={() => onLoadBowl(bowl)}
-            onDelete={() => onDeleteBowl(bowl.id)}
-            onAddToWeek={() => onAddToWeek(bowl)}
-          />
-        ))}
+    <div className="space-y-8">
+      {savedBowls.length > 0 && (
+        <div>
+          <h2 className="font-semibold text-gray-900 mb-4">Your Saved Bowls ({savedBowls.length})</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {savedBowls.map(bowl => (
+              <SavedBowlCard
+                key={bowl.id}
+                bowl={bowl}
+                onLoad={() => onLoadBowl(bowl)}
+                onDelete={() => onDeleteBowl(bowl.id)}
+                onAddToWeek={() => onAddToWeek(bowl)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <h2 className="font-semibold text-gray-900 mb-1">Inspiration</h2>
+        <p className="text-sm text-gray-400 mb-4">A few starter bowls to get you going.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {exampleBowls.map(bowl => (
+            <SavedBowlCard
+              key={bowl.id}
+              bowl={bowl}
+              onLoad={() => onLoadBowl(bowl)}
+              onAddToWeek={() => onAddToWeek(bowl)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -45,7 +58,7 @@ function SavedBowlCard({
 }: {
   bowl: Bowl;
   onLoad: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   onAddToWeek: () => void;
 }) {
   const flavorColor = bowl.flavorProfile ? FLAVOR_COLORS[bowl.flavorProfile] ?? '' : '';
@@ -107,12 +120,14 @@ function SavedBowlCard({
         >
           Edit
         </button>
-        <button
-          onClick={onDelete}
-          className="py-1.5 px-2.5 text-xs font-medium text-red-400 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-        >
-          ✕
-        </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="py-1.5 px-2.5 text-xs font-medium text-red-400 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+          >
+            ✕
+          </button>
+        )}
       </div>
     </div>
   );

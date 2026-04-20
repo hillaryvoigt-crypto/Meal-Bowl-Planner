@@ -16,6 +16,7 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'nuts_seeds', label: 'Nuts & Seeds' },
   { value: 'cheese', label: 'Cheese' },
   { value: 'finishing', label: 'Finishing' },
+  { value: 'marinade', label: 'Glaze / Marinade' },
 ];
 
 export default function AddIngredientModal({ hasApiKey, onAdd, onClose }: Props) {

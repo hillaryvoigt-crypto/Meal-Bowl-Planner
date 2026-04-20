@@ -222,6 +222,7 @@ export default function App() {
         {activeTab === 'recipes' && (
           <RecipeBook
             savedBowls={savedBowls}
+            allIngredients={ingredients}
             onLoadBowl={handleLoadBowl}
             onDeleteBowl={handleDeleteSaved}
             onAddToWeek={handleAddToWeek}
