@@ -1,53 +1,65 @@
-import type { Bowl } from '../types';
+import type { Bowl, Ingredient } from '../types';
 import ShoppingList from './ShoppingList';
+import WeekPlannerAssistant from './WeekPlannerAssistant';
 import { FLAVOR_COLORS } from '../data/ingredients';
 
 interface Props {
   weekPlan: Bowl[];
+  allIngredients: Ingredient[];
+  hasApiKey: boolean;
   onRemoveBowl: (id: string) => void;
   onClearWeek: () => void;
   onLoadBowl: (bowl: Bowl) => void;
+  onAddBowls: (bowls: Bowl[]) => void;
 }
 
-export default function WeekPlanner({ weekPlan, onRemoveBowl, onClearWeek, onLoadBowl }: Props) {
-  if (weekPlan.length === 0) {
-    return (
-      <div className="space-y-4">
+export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRemoveBowl, onClearWeek, onLoadBowl, onAddBowls }: Props) {
+  return (
+    <div className="space-y-6">
+      {hasApiKey && (
+        <WeekPlannerAssistant
+          availableIngredients={allIngredients}
+          existingPlan={weekPlan}
+          onAddBowls={onAddBowls}
+        />
+      )}
+
+      {weekPlan.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
           <div className="text-4xl mb-3">🥗</div>
           <p className="text-gray-500 font-medium">No bowls planned yet</p>
-          <p className="text-sm text-gray-400 mt-1">Build a bowl and click "Add to Week Plan"</p>
+          <p className="text-sm text-gray-400 mt-1">
+            {hasApiKey ? 'Use "Plan My Week" above or build a bowl and click "Add to Week Plan"' : 'Build a bowl and click "Add to Week Plan"'}
+          </p>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <>
+          {/* Bowl cards */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900">This Week's Bowls</h2>
+              <button
+                onClick={onClearWeek}
+                className="text-xs text-red-400 hover:text-red-600 transition-colors"
+              >
+                Clear week
+              </button>
+            </div>
 
-  return (
-    <div className="space-y-6">
-      {/* Bowl cards */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900">This Week's Bowls</h2>
-          <button
-            onClick={onClearWeek}
-            className="text-xs text-red-400 hover:text-red-600 transition-colors"
-          >
-            Clear week
-          </button>
-        </div>
+            {weekPlan.map(bowl => (
+              <BowlCard
+                key={bowl.id}
+                bowl={bowl}
+                onRemove={() => onRemoveBowl(bowl.id)}
+                onLoad={() => onLoadBowl(bowl)}
+              />
+            ))}
+          </div>
 
-        {weekPlan.map(bowl => (
-          <BowlCard
-            key={bowl.id}
-            bowl={bowl}
-            onRemove={() => onRemoveBowl(bowl.id)}
-            onLoad={() => onLoadBowl(bowl)}
-          />
-        ))}
-      </div>
-
-      {/* Shopping list */}
-      <ShoppingList weekPlan={weekPlan} />
+          {/* Shopping list */}
+          <ShoppingList weekPlan={weekPlan} />
+        </>
+      )}
     </div>
   );
 }

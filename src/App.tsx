@@ -213,9 +213,12 @@ export default function App() {
         {activeTab === 'planner' && (
           <WeekPlanner
             weekPlan={weekPlan}
+            allIngredients={ingredients}
+            hasApiKey={hasApiKey}
             onRemoveBowl={handleRemoveFromWeek}
             onClearWeek={() => setWeekPlan([])}
             onLoadBowl={handleLoadBowl}
+            onAddBowls={bowls => bowls.forEach(handleAddToWeek)}
           />
         )}
 

@@ -117,6 +117,92 @@ Respond ONLY with valid JSON matching exactly:
   return JSON.parse(jsonMatch[0]) as StyleSuggestion;
 }
 
+export interface BowlPlanItem {
+  name: string;
+  flavorProfile: FlavorProfile;
+  servings: 2;
+  carb: string | null;
+  protein: string | null;
+  sauces: string[];
+  toppings: string[];
+}
+
+export async function planWeek(params: {
+  count: number;
+  preferences?: { cravings?: string; avoid?: string; fridgeItems?: string };
+  availableIngredients: Ingredient[];
+  existingPlan: { protein: string | null; flavorProfile: string | null }[];
+}): Promise<BowlPlanItem[]> {
+  const client = getClient();
+  if (!client) throw new Error('No API key configured');
+
+  const byCategory = (cat: string) =>
+    params.availableIngredients
+      .filter(i => i.category === cat)
+      .map(i => i.name)
+      .join(', ');
+
+  const ingredientMenu = [
+    `Carbs: ${byCategory('carb')}`,
+    `Proteins: ${byCategory('protein')}`,
+    `Sauces: ${byCategory('sauce')}`,
+    `Fruits & Veggies: ${byCategory('fruit_veg')}`,
+    `Nuts & Seeds: ${byCategory('nuts_seeds')}`,
+    `Cheese: ${byCategory('cheese')}`,
+    `Finishing Touches: ${byCategory('finishing')}`,
+    `Glazes & Marinades: ${byCategory('marinade')}`,
+  ].join('\n');
+
+  const existingSummary = params.existingPlan.length > 0
+    ? `Already planned this week: ${params.existingPlan.map(b => `${b.protein ?? 'no protein'} (${b.flavorProfile ?? 'no flavor'})`).join(', ')}.`
+    : 'Nothing planned yet this week.';
+
+  const prefLines: string[] = [];
+  if (params.preferences?.cravings) prefLines.push(`Cravings / vibes: ${params.preferences.cravings}`);
+  if (params.preferences?.avoid) prefLines.push(`Avoid: ${params.preferences.avoid}`);
+  if (params.preferences?.fridgeItems) prefLines.push(`Use up from fridge: ${params.preferences.fridgeItems}`);
+  const prefBlock = prefLines.length ? `\nPreferences:\n${prefLines.join('\n')}` : '';
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
+    system: [
+      {
+        type: 'text',
+        text: `You are a meal bowl planning assistant. Plan a varied, cost-conscious week of bowls.
+
+Rules:
+- Only use ingredient names EXACTLY as listed in the menu below.
+- Vary proteins across bowls (no same protein twice unless unavoidable).
+- Vary flavor profiles across bowls.
+- Reuse perishables (e.g. same cheese across 2 bowls) to reduce waste.
+- Mix plant-based and meat proteins for cost balance (steak/shrimp max once).
+- Each bowl: 1 carb, 1 protein, 1–2 sauces, 2–5 toppings from fruit_veg/nuts_seeds/cheese/finishing/marinade.
+- flavorProfile must be one of: Mexican, Asian, Mediterranean, Greek, Indian, American, Japanese, Thai, Middle Eastern, Mixed.
+- Respond ONLY with a valid JSON array of bowl objects.
+
+Ingredient menu:
+${ingredientMenu}`,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
+    messages: [
+      {
+        role: 'user',
+        content: `Plan ${params.count} bowls for this week. ${existingSummary}${prefBlock}
+
+Respond with a JSON array only, no other text:
+[{"name": string, "flavorProfile": string, "servings": 2, "carb": string|null, "protein": string|null, "sauces": string[], "toppings": string[]}, ...]`,
+      },
+    ],
+  });
+
+  const text = response.content[0].type === 'text' ? response.content[0].text : '';
+  const jsonMatch = text.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) throw new Error('Invalid response from AI');
+  return JSON.parse(jsonMatch[0]) as BowlPlanItem[];
+}
+
 export interface IngredientLookup {
   protein: number;
   calories: number;
