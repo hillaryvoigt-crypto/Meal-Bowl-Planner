@@ -58,7 +58,7 @@ function SavedBowlCard({
 }: {
   bowl: Bowl;
   onLoad: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   onAddToWeek: () => void;
 }) {
   const flavorColor = bowl.flavorProfile ? FLAVOR_COLORS[bowl.flavorProfile] ?? '' : '';
