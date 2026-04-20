@@ -43,10 +43,11 @@ function buildShoppingList(bowls: Bowl[]): ShoppingLineItem[] {
   });
 }
 
-const CATEGORY_ORDER = ['carb', 'protein', 'sauce', 'fruit_veg', 'nuts_seeds', 'cheese', 'finishing'] as const;
+const CATEGORY_ORDER = ['carb', 'protein', 'marinade', 'sauce', 'fruit_veg', 'nuts_seeds', 'cheese', 'finishing'] as const;
 const CATEGORY_LABELS: Record<string, string> = {
   carb: 'Carbs',
   protein: 'Proteins',
+  marinade: 'Glazes & Marinades',
   sauce: 'Sauces',
   fruit_veg: 'Fruits & Veggies',
   nuts_seeds: 'Nuts & Seeds',

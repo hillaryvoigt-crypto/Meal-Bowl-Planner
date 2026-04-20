@@ -135,6 +135,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
           { category: 'nuts_seeds' as const, label: 'Nuts & Seeds', multi: true, selected: toppings.filter(t => t.category === 'nuts_seeds').map(t => t.id), onToggle: toggleTopping },
           { category: 'cheese' as const, label: 'Cheese', multi: true, selected: toppings.filter(t => t.category === 'cheese').map(t => t.id), onToggle: toggleTopping },
           { category: 'finishing' as const, label: 'Finishing Touches', multi: true, selected: toppings.filter(t => t.category === 'finishing').map(t => t.id), onToggle: toggleTopping },
+          { category: 'marinade' as const, label: 'Glazes & Marinades', multi: true, selected: toppings.filter(t => t.category === 'marinade').map(t => t.id), onToggle: toggleTopping },
         ].map(({ category, label, multi, selected, onToggle }) => (
           <div key={category} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-3">

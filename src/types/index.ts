@@ -1,4 +1,4 @@
-export type Category = 'carb' | 'protein' | 'sauce' | 'fruit_veg' | 'nuts_seeds' | 'cheese' | 'finishing';
+export type Category = 'carb' | 'protein' | 'sauce' | 'fruit_veg' | 'nuts_seeds' | 'cheese' | 'finishing' | 'marinade';
 
 export type FlavorProfile =
   | 'Mexican'
