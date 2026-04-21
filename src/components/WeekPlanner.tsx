@@ -10,10 +10,11 @@ interface Props {
   onRemoveBowl: (id: string) => void;
   onClearWeek: () => void;
   onLoadBowl: (bowl: Bowl) => void;
+  onSaveBowl: (bowl: Bowl) => void;
   onAddBowls: (bowls: Bowl[]) => void;
 }
 
-export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRemoveBowl, onClearWeek, onLoadBowl, onAddBowls }: Props) {
+export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRemoveBowl, onClearWeek, onLoadBowl, onSaveBowl, onAddBowls }: Props) {
   return (
     <div className="space-y-6">
       {hasApiKey && (
@@ -52,6 +53,7 @@ export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRem
                 bowl={bowl}
                 onRemove={() => onRemoveBowl(bowl.id)}
                 onLoad={() => onLoadBowl(bowl)}
+                onSave={() => onSaveBowl(bowl)}
               />
             ))}
           </div>
@@ -64,7 +66,7 @@ export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRem
   );
 }
 
-function BowlCard({ bowl, onRemove, onLoad }: { bowl: Bowl; onRemove: () => void; onLoad: () => void }) {
+function BowlCard({ bowl, onRemove, onLoad, onSave }: { bowl: Bowl; onRemove: () => void; onLoad: () => void; onSave: () => void }) {
   const flavorColor = bowl.flavorProfile ? FLAVOR_COLORS[bowl.flavorProfile] ?? '' : '';
 
   const allToppings = [
@@ -116,16 +118,22 @@ function BowlCard({ bowl, onRemove, onLoad }: { bowl: Bowl; onRemove: () => void
 
       <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
         <button
-          onClick={onLoad}
+          onClick={onSave}
           className="flex-1 py-1.5 text-xs font-medium text-bowl-green border border-bowl-green rounded-lg hover:bg-green-50 transition-colors"
+        >
+          Save to Book
+        </button>
+        <button
+          onClick={onLoad}
+          className="flex-1 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={onRemove}
-          className="flex-1 py-1.5 text-xs font-medium text-red-400 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+          className="py-1.5 px-3 text-xs font-medium text-red-400 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
         >
-          Remove
+          ✕
         </button>
       </div>
     </div>

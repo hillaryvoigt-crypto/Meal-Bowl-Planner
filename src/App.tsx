@@ -218,6 +218,7 @@ export default function App() {
             onRemoveBowl={handleRemoveFromWeek}
             onClearWeek={() => setWeekPlan([])}
             onLoadBowl={handleLoadBowl}
+            onSaveBowl={handleSaveBowl}
             onAddBowls={bowls => bowls.forEach(handleAddToWeek)}
           />
         )}

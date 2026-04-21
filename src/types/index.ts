@@ -26,6 +26,7 @@ export interface Ingredient {
   };
   flavorTags: string[];  // e.g. ['mexican', 'latin', 'asian']
   recipe?: string;       // for sauces: short recipe note
+  shoppingItems?: string[]; // grocery items to buy to make this (homemade sauces/marinades)
   perishable?: boolean;  // false = dry staple or frozen; omitted/true = fresh/refrigerated
   isCustom?: boolean;
 }

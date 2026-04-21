@@ -258,6 +258,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['mexican', 'latin', 'american'],
     recipe: 'Blend: 2 chipotles in adobo, ½ cup mayo, juice of 1 lime, 1 garlic clove, salt.',
+    shoppingItems: ['Chipotles in adobo (small can)', 'Mayonnaise', 'Lime', 'Garlic'],
   },
   {
     id: 'guacamole',
@@ -269,6 +270,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['mexican', 'latin'],
     recipe: 'Mash: 1 ripe avocado, juice of 1 lime, 2 tbsp diced onion, 1 tbsp cilantro, salt, optional jalapeño. Makes ~4 servings.',
+    shoppingItems: ['Avocado × 1', 'Lime', 'White onion', 'Cilantro'],
   },
   {
     id: 'hummus',
@@ -290,6 +292,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['mexican', 'latin'],
     recipe: 'Blend: juice of 2 limes, ¼ cup cilantro, 2 tbsp olive oil, 1 garlic clove, ½ tsp cumin, salt.',
+    shoppingItems: ['Limes × 2', 'Cilantro', 'Garlic', 'Olive oil', 'Ground cumin'],
   },
   {
     id: 'miso-ginger-dressing',
@@ -301,6 +304,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['asian', 'japanese'],
     recipe: 'Whisk: 2 tbsp white miso, 2 tbsp rice vinegar, 1 tbsp sesame oil, 1 tsp fresh ginger, 1 tsp honey.',
+    shoppingItems: ['White miso paste', 'Rice vinegar', 'Sesame oil', 'Fresh ginger', 'Honey'],
   },
   {
     id: 'peanut-sauce',
@@ -312,6 +316,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['asian', 'thai'],
     recipe: 'Mix: 3 tbsp peanut butter, 2 tbsp soy sauce, 1 tbsp lime juice, 1 tsp ginger, 1 clove garlic, 1 tsp sesame oil, chili flakes, 2–3 tbsp warm water.',
+    shoppingItems: ['Peanut butter', 'Soy sauce', 'Lime', 'Fresh ginger', 'Garlic', 'Sesame oil'],
   },
   {
     id: 'pico-de-gallo',
@@ -323,6 +328,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['mexican', 'latin'],
     recipe: 'Dice: 3 roma tomatoes, ½ white onion, 2 jalapeños (seeded), ½ cup cilantro. Mix with juice of 2 limes, salt to taste. Rest 15 min.',
+    shoppingItems: ['Roma tomatoes × 3', 'Jalapeños × 2', 'White onion', 'Cilantro', 'Limes × 2'],
   },
   {
     id: 'soy-sesame-dressing',
@@ -334,6 +340,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 8 },
     flavorTags: ['asian', 'japanese'],
     recipe: 'Whisk: 3 tbsp soy sauce, 2 tbsp rice vinegar, 1 tbsp sesame oil, 1 tsp ginger (grated), 1 tsp honey.',
+    shoppingItems: ['Soy sauce', 'Rice vinegar', 'Sesame oil', 'Fresh ginger', 'Honey'],
   },
   {
     id: 'sriracha',
@@ -356,6 +363,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: '16 oz jar', servingsPerPackage: 16 },
     flavorTags: ['mediterranean', 'middle-eastern', 'greek'],
     recipe: 'Whisk: 3 tbsp tahini, 2 tbsp lemon juice, 1 garlic clove (minced), 2–3 tbsp water, salt to taste.',
+    shoppingItems: ['Tahini (jar)', 'Lemons × 2', 'Garlic'],
     perishable: false,
   },
   {
@@ -379,6 +387,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['greek', 'mediterranean'],
     recipe: 'Mix: ½ cup Greek yogurt, ¼ cucumber (grated & squeezed dry), 1 garlic clove (minced), 1 tsp fresh dill, 1 tbsp lemon juice, 1 tsp olive oil, salt. Makes ~4 servings.',
+    shoppingItems: ['Plain Greek yogurt', 'Cucumber', 'Garlic', 'Fresh dill', 'Lemon', 'Olive oil'],
   },
 
   // ── FRUITS & VEGGIES (alphabetical by sort key) ───────────────────
@@ -842,6 +851,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['mexican', 'american'],
     perishable: false,
     recipe: 'Mix: 1 tbsp chili powder, 1 tsp cumin, 1 tsp smoked paprika, ½ tsp garlic powder, zest of 1 lime, 1 tbsp olive oil, salt. Coat protein and rest 30 min. Great for chicken and shrimp.',
+    shoppingItems: ['Chili powder', 'Ground cumin', 'Smoked paprika', 'Lime'],
   },
   {
     id: 'cilantro-lime-marinade',
@@ -853,6 +863,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['mexican', 'latin'],
     recipe: 'Blend: juice of 2 limes, ¼ cup cilantro, 3 tbsp olive oil, 3 garlic cloves, 1 tsp cumin, salt. Marinate chicken or shrimp 30 min–2 hrs.',
+    shoppingItems: ['Limes × 2', 'Cilantro', 'Garlic', 'Olive oil', 'Ground cumin'],
   },
   {
     id: 'harissa-marinade',
@@ -864,6 +875,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['middle-eastern', 'mediterranean'],
     recipe: 'Mix: 2 tbsp harissa paste, 2 tbsp olive oil, juice of 1 lemon, 2 garlic cloves (minced), salt. Marinate chicken or salmon 1–4 hrs.',
+    shoppingItems: ['Harissa paste', 'Olive oil', 'Lemon', 'Garlic'],
   },
   {
     id: 'honey-garlic-glaze',
@@ -875,6 +887,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['american', 'asian'],
     recipe: 'Mix: 3 tbsp honey, 2 tbsp soy sauce, 4 garlic cloves (minced), 1 tbsp rice vinegar. Brush on chicken or shrimp while cooking, or marinate 30 min.',
+    shoppingItems: ['Honey', 'Soy sauce', 'Garlic', 'Rice vinegar'],
   },
   {
     id: 'lemon-herb-marinade',
@@ -886,6 +899,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['mediterranean', 'american'],
     recipe: 'Mix: juice of 1 lemon, 3 tbsp olive oil, 3 garlic cloves (minced), 1 tsp dried oregano, 1 tsp dried thyme, salt and pepper. Marinate chicken or salmon 1–4 hrs.',
+    shoppingItems: ['Lemon', 'Olive oil', 'Garlic', 'Dried oregano', 'Dried thyme'],
   },
   {
     id: 'miso-ginger-glaze',
@@ -897,6 +911,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['asian', 'japanese'],
     recipe: 'Whisk: 2 tbsp white miso, 1 tbsp mirin, 1 tbsp soy sauce, 1 tsp fresh ginger, 1 tsp sesame oil, 1 tsp honey. Spread on salmon or chicken; roast or broil.',
+    shoppingItems: ['White miso paste', 'Mirin', 'Soy sauce', 'Fresh ginger', 'Sesame oil', 'Honey'],
   },
   {
     id: 'sesame-ginger-marinade',
@@ -908,6 +923,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['asian'],
     recipe: 'Mix: 3 tbsp soy sauce, 1 tbsp sesame oil, 1 tbsp rice vinegar, 1 tsp fresh ginger (grated), 2 garlic cloves, 1 tsp honey. Marinate salmon, chicken, or shrimp 30 min–2 hrs.',
+    shoppingItems: ['Soy sauce', 'Sesame oil', 'Rice vinegar', 'Fresh ginger', 'Garlic', 'Honey'],
   },
   {
     id: 'smoky-chipotle-rub',
@@ -920,6 +936,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['mexican', 'american'],
     perishable: false,
     recipe: 'Mix: 1 tbsp chipotle chili powder, 1 tsp smoked paprika, 1 tsp cumin, ½ tsp garlic powder, ½ tsp onion powder, 1 tbsp olive oil, salt. Coat chicken or shrimp; rest 30 min.',
+    shoppingItems: ['Chipotle chili powder', 'Smoked paprika', 'Ground cumin', 'Garlic powder'],
   },
   {
     id: 'tandoori-marinade',
@@ -931,6 +948,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     packageInfo: { label: 'homemade batch', servingsPerPackage: 4 },
     flavorTags: ['indian'],
     recipe: 'Mix: ¼ cup Greek yogurt, 1 tbsp tandoori masala, juice of ½ lemon, 2 garlic cloves (minced), 1 tsp fresh ginger. Marinate chicken at least 2 hrs (overnight is best).',
+    shoppingItems: ['Plain Greek yogurt', 'Tandoori masala spice blend', 'Lemon', 'Garlic', 'Fresh ginger'],
   },
   {
     id: 'teriyaki-marinade',
@@ -943,6 +961,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['asian', 'japanese'],
     perishable: false,
     recipe: 'Mix: ¼ cup soy sauce, 2 tbsp mirin, 1 tbsp sake (or dry sherry), 1 tbsp brown sugar, 1 tsp fresh ginger. Marinate salmon, chicken, or shrimp 30 min–2 hrs.',
+    shoppingItems: ['Soy sauce', 'Mirin', 'Sake or dry sherry', 'Brown sugar', 'Fresh ginger'],
   },
 ];
 
