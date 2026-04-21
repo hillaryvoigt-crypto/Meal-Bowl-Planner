@@ -3,20 +3,36 @@ import type { Bowl, Ingredient, ShoppingLineItem } from '../types';
 
 interface Props {
   weekPlan: Bowl[];
+  allIngredients: Ingredient[];
 }
 
-function buildShoppingList(bowls: Bowl[]): ShoppingLineItem[] {
+// Strip common prep modifiers so shopping names are clean
+function shopName(ing: Ingredient): string {
+  let name = ing.name;
+  name = name.replace(/^Squeeze of /i, '');
+  name = name.replace(/^(Roasted|Fresh|Pickled|Shredded|Sliced|Toasted|Baby|Crushed|Shaved|Fried)\s+/i, '');
+  name = name.replace(/\s*\/.*$/, ''); // "X / Y" → "X"
+  name = name.replace(/\s*\([\d%]+\)$/, ''); // remove "(85%)" etc.
+  name = name.replace(/\s+Drizzle$/i, ''); // "Olive Oil Drizzle" → "Olive Oil"
+  return name.trim();
+}
+
+function buildShoppingList(bowls: Bowl[], freshIngredients: Ingredient[]): ShoppingLineItem[] {
+  const freshById = new Map(freshIngredients.map(i => [i.id, i]));
   const map = new Map<string, ShoppingLineItem>();
 
   for (const bowl of bowls) {
-    const allIngredients = [
+    const bowlIngredients = [
       bowl.carb,
       bowl.protein,
       ...bowl.sauces,
       ...bowl.toppings,
     ].filter(Boolean) as Ingredient[];
 
-    for (const ing of allIngredients) {
+    for (const stored of bowlIngredients) {
+      // Always use the fresh ingredient data so shoppingItems / shopAs stay current
+      const ing = freshById.get(stored.id) ?? stored;
+
       if (map.has(ing.id)) {
         const item = map.get(ing.id)!;
         item.servingsNeeded += bowl.servings;
@@ -53,7 +69,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   finishing: 'Finishing Touches',
 };
 
-export default function ShoppingList({ weekPlan }: Props) {
+export default function ShoppingList({ weekPlan, allIngredients }: Props) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
 
   if (weekPlan.length === 0) {
@@ -64,14 +80,13 @@ export default function ShoppingList({ weekPlan }: Props) {
     );
   }
 
-  const allItems = buildShoppingList(weekPlan);
+  const allItems = buildShoppingList(weekPlan, allIngredients);
 
-  // Separate homemade (has shoppingItems) from store-bought
   const homemadeItems = allItems.filter(
-    i => (i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && i.ingredient.shoppingItems
+    i => (i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && i.ingredient.shoppingItems?.length
   );
   const regularItems = allItems.filter(
-    i => !((i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && i.ingredient.shoppingItems)
+    i => !((i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && i.ingredient.shoppingItems?.length)
   );
 
   function toggleItem(key: string) {
@@ -88,7 +103,6 @@ export default function ShoppingList({ weekPlan }: Props) {
     items: regularItems.filter(i => i.ingredient.category === cat && !checked.has(i.ingredient.id)),
   })).filter(g => g.items.length > 0);
 
-  // Store-bought sauces/marinades (no shoppingItems)
   const storeBoughtSauces = regularItems.filter(
     i => (i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && !checked.has(i.ingredient.id)
   );
@@ -114,7 +128,6 @@ export default function ShoppingList({ weekPlan }: Props) {
         </div>
       </div>
 
-      {/* Regular categories */}
       {byCategory.map(({ cat, items }) => (
         <div key={cat} className="px-5 py-3">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
@@ -129,7 +142,7 @@ export default function ShoppingList({ weekPlan }: Props) {
               >
                 <div className="flex items-start gap-2 flex-1">
                   <span className="mt-0.5 text-gray-300 group-hover:text-bowl-green transition-colors">☐</span>
-                  <span className="font-medium text-gray-800">{item.ingredient.name}</span>
+                  <span className="font-medium text-gray-800">{shopName(item.ingredient)}</span>
                   {item.usedInBowls.length > 1 && (
                     <span className="text-xs text-gray-400 mt-0.5">({item.usedInBowls.length} bowls)</span>
                   )}
@@ -144,7 +157,6 @@ export default function ShoppingList({ weekPlan }: Props) {
         </div>
       ))}
 
-      {/* Store-bought sauces */}
       {storeBoughtSauces.length > 0 && (
         <div className="px-5 py-3">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
@@ -171,7 +183,6 @@ export default function ShoppingList({ weekPlan }: Props) {
         </div>
       )}
 
-      {/* Homemade sauces & marinades — broken down into ingredients */}
       {homemadeItems.length > 0 && (
         <div className="px-5 py-3">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -179,30 +190,23 @@ export default function ShoppingList({ weekPlan }: Props) {
           </h4>
           <div className="space-y-4">
             {homemadeItems.map(item => {
-              const subItems = (item.ingredient.shoppingItems ?? []).filter(
-                sub => !checked.has(`${item.ingredient.id}__${sub}`)
-              );
-              if (subItems.length === 0 && item.ingredient.shoppingItems?.every(sub => checked.has(`${item.ingredient.id}__${sub}`))) {
-                return null;
-              }
+              const allSubs = item.ingredient.shoppingItems ?? [];
+              const visibleSubs = allSubs.filter(sub => !checked.has(`${item.ingredient.id}__${sub}`));
+              if (visibleSubs.length === 0) return null;
               return (
                 <div key={item.ingredient.id}>
                   <p className="text-sm font-medium text-gray-700 mb-1.5">{item.ingredient.name}</p>
                   <ul className="space-y-1.5 pl-1">
-                    {(item.ingredient.shoppingItems ?? []).map(sub => {
-                      const key = `${item.ingredient.id}__${sub}`;
-                      if (checked.has(key)) return null;
-                      return (
-                        <li
-                          key={sub}
-                          className="flex items-center gap-2 text-sm cursor-pointer group"
-                          onClick={() => toggleItem(key)}
-                        >
-                          <span className="text-gray-300 group-hover:text-bowl-green transition-colors">☐</span>
-                          <span className="text-gray-700">{sub}</span>
-                        </li>
-                      );
-                    })}
+                    {visibleSubs.map(sub => (
+                      <li
+                        key={sub}
+                        className="flex items-center gap-2 text-sm cursor-pointer group"
+                        onClick={() => toggleItem(`${item.ingredient.id}__${sub}`)}
+                      >
+                        <span className="text-gray-300 group-hover:text-bowl-green transition-colors">☐</span>
+                        <span className="text-gray-700">{sub}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               );

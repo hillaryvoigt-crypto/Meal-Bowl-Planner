@@ -59,7 +59,7 @@ export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRem
           </div>
 
           {/* Shopping list */}
-          <ShoppingList weekPlan={weekPlan} />
+          <ShoppingList weekPlan={weekPlan} allIngredients={allIngredients} />
         </>
       )}
     </div>
