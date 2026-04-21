@@ -13,6 +13,7 @@ interface Props {
   onAddToWeek: (bowl: Bowl) => void;
   onSaveBowl: (bowl: Bowl) => void;
   onAddIngredient: (ingredient: Ingredient) => void;
+  onRemoveIngredient: (id: string) => void;
 }
 
 function computeProtein(
@@ -35,7 +36,7 @@ function computeCalories(
   return Math.round(items.reduce((sum, i) => sum + i.calories, 0));
 }
 
-export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAddToWeek, onSaveBowl, onAddIngredient }: Props) {
+export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAddToWeek, onSaveBowl, onAddIngredient, onRemoveIngredient }: Props) {
   const [bowlName, setBowlName] = useState(initialBowl?.name ?? '');
   const [servings, setServings] = useState<1 | 2>(initialBowl?.servings ?? 2);
   const [carb, setCarb] = useState<Ingredient | null>(initialBowl?.carb ?? null);
@@ -44,6 +45,8 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
   const [toppings, setToppings] = useState<Ingredient[]>(initialBowl?.toppings ?? []);
   const [flavorProfile, setFlavorProfile] = useState<FlavorProfile>(initialBowl?.flavorProfile ?? null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalCategory, setAddModalCategory] = useState<Ingredient['category'] | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Ingredient['category'] | null>(null);
 
   const byCategory = (cat: Ingredient['category']) =>
     ingredients.filter(i => i.category === cat);
@@ -136,23 +139,42 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
           { category: 'nuts_seeds' as const, label: 'Nuts & Seeds', multi: true, selected: toppings.filter(t => t.category === 'nuts_seeds').map(t => t.id), onToggle: toggleTopping },
           { category: 'cheese' as const, label: 'Cheese', multi: true, selected: toppings.filter(t => t.category === 'cheese').map(t => t.id), onToggle: toggleTopping },
           { category: 'finishing' as const, label: 'Finishing Touches', multi: true, selected: toppings.filter(t => t.category === 'finishing').map(t => t.id), onToggle: toggleTopping },
-        ].map(({ category, label, multi, selected, onToggle }) => (
-          <div key={category} className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">{label}</h3>
-              <span className="text-xs text-gray-400">{multi ? 'pick any' : 'pick one'}</span>
+        ].map(({ category, label, multi, selected, onToggle }) => {
+          const isEditing = editingCategory === category;
+          return (
+            <div key={category} className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-semibold text-gray-900">{label}</h3>
+                {!isEditing && <span className="text-xs text-gray-400">{multi ? 'pick any' : 'pick one'}</span>}
+                <button
+                  onClick={() => setEditingCategory(isEditing ? null : category)}
+                  className="ml-auto text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {isEditing ? 'Done' : 'Edit list'}
+                </button>
+              </div>
+              <IngredientGrid
+                ingredients={byCategory(category)}
+                selectedIds={selected}
+                multiSelect={multi}
+                onToggle={onToggle}
+                editMode={isEditing}
+                onRemove={isEditing ? onRemoveIngredient : undefined}
+              />
+              {isEditing && (
+                <button
+                  onClick={() => { setAddModalCategory(category); setShowAddModal(true); }}
+                  className="mt-3 text-xs text-bowl-green hover:text-green-700 font-medium transition-colors"
+                >
+                  + Add ingredient to this section
+                </button>
+              )}
             </div>
-            <IngredientGrid
-              ingredients={byCategory(category)}
-              selectedIds={selected}
-              multiSelect={multi}
-              onToggle={onToggle}
-            />
-          </div>
-        ))}
+          );
+        })}
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => { setAddModalCategory(null); setShowAddModal(true); }}
           className="w-full py-2.5 text-sm font-medium text-gray-500 border border-dashed border-gray-300 rounded-xl hover:border-bowl-green hover:text-bowl-green transition-colors"
         >
           + Add custom ingredient
@@ -272,8 +294,9 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
       {showAddModal && (
         <AddIngredientModal
           hasApiKey={hasApiKey}
+          defaultCategory={addModalCategory ?? undefined}
           onAdd={onAddIngredient}
-          onClose={() => setShowAddModal(false)}
+          onClose={() => { setShowAddModal(false); setAddModalCategory(null); }}
         />
       )}
     </div>

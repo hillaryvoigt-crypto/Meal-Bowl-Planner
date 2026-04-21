@@ -35,7 +35,8 @@ const TABS: { id: Tab; label: string; emoji: string }[] = [
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('builder');
   const [customIngredients, setCustomIngredients] = usePersistedState<Ingredient[]>('bowl-custom-ingredients', []);
-  const ingredients = [...DEFAULT_INGREDIENTS, ...customIngredients];
+  const [hiddenIngredientIds, setHiddenIngredientIds] = usePersistedState<string[]>('bowl-hidden-ingredients', []);
+  const ingredients = [...DEFAULT_INGREDIENTS, ...customIngredients].filter(i => !hiddenIngredientIds.includes(i.id));
   const [weekPlan, setWeekPlan] = usePersistedState<Bowl[]>('bowl-week-plan', []);
   const [savedBowls, setSavedBowls] = usePersistedState<Bowl[]>('bowl-saved', []);
   const [builderKey, setBuilderKey] = useState(0);
@@ -106,6 +107,15 @@ export default function App() {
       showNotification('Synced from code ' + code);
     } else {
       showNotification('No data found for that code');
+    }
+  }
+
+  function handleRemoveIngredient(id: string) {
+    const isCustom = customIngredients.find(i => i.id === id);
+    if (isCustom) {
+      setCustomIngredients(prev => prev.filter(i => i.id !== id));
+    } else {
+      setHiddenIngredientIds(prev => [...prev, id]);
     }
   }
 
@@ -207,6 +217,7 @@ export default function App() {
             onAddToWeek={handleAddToWeek}
             onSaveBowl={handleSaveBowl}
             onAddIngredient={handleAddIngredient}
+            onRemoveIngredient={handleRemoveIngredient}
           />
         )}
 

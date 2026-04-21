@@ -175,7 +175,8 @@ Rules:
 - Only use ingredient names EXACTLY as listed in the menu below.
 - Vary proteins across bowls (no same protein twice unless unavoidable).
 - Vary flavor profiles across bowls.
-- Reuse perishables across bowls to minimize waste — e.g. if you use feta in one bowl, try to use it again; same for cheese, open jars, fresh herbs, and block proteins like salmon or chicken that come in packages with 3–5 servings.
+- Reuse non-meat perishables across bowls to minimize waste — e.g. use the same feta, goat cheese, or fresh herb in 2 bowls since those packages last.
+- For raw meat and fish (chicken, beef, salmon, shrimp, ground turkey, steak), do NOT plan the same protein across multiple bowls. The user cooks the whole package at once and handles leftovers themselves.
 - Mix plant-based and meat proteins for cost balance (steak/shrimp max once per week).
 - Each bowl: 1 carb, 1 protein, 1–2 sauces, 2–5 toppings from fruit_veg/nuts_seeds/cheese/finishing/marinade.
 - flavorProfile must be one of: Mexican, Asian, Mediterranean, Greek, Indian, American, Japanese, Thai, Middle Eastern, Mixed.

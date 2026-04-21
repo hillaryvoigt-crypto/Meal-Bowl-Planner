@@ -4,6 +4,7 @@ import { lookupIngredientNutrition } from '../services/claude';
 
 interface Props {
   hasApiKey: boolean;
+  defaultCategory?: Category;
   onAdd: (ingredient: Ingredient) => void;
   onClose: () => void;
 }
@@ -19,9 +20,9 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'marinade', label: 'Marinade' },
 ];
 
-export default function AddIngredientModal({ hasApiKey, onAdd, onClose }: Props) {
+export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, onClose }: Props) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<Category>('fruit_veg');
+  const [category, setCategory] = useState<Category>(defaultCategory ?? 'fruit_veg');
   const [protein, setProtein] = useState('');
   const [calories, setCalories] = useState('');
   const [serving, setServing] = useState('');
