@@ -153,21 +153,15 @@ export default function ShoppingList({ weekPlan, allIngredients }: Props) {
     regularItems.filter(i => !checked.has(i.ingredient.id)).length +
     consolidatedHomemade.filter(item => !checked.has(`homemade__${normalizeKey(item.name)}`)).length;
 
+  const checkedRegularItems = regularItems.filter(i => checked.has(i.ingredient.id));
+  const checkedHomemadeItems = consolidatedHomemade.filter(item => checked.has(`homemade__${normalizeKey(item.name)}`));
+  const alreadyHaveCount = checkedRegularItems.length + checkedHomemadeItems.length;
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
       <div className="px-5 py-3 flex items-center justify-between">
         <h3 className="font-semibold text-gray-900">Shopping List</h3>
-        <div className="flex items-center gap-3">
-          {checked.size > 0 && (
-            <button
-              onClick={() => setChecked(new Set())}
-              className="text-xs text-gray-400 hover:text-gray-600"
-            >
-              restore {checked.size} checked
-            </button>
-          )}
-          <span className="text-xs text-gray-400">{totalUnchecked} items</span>
-        </div>
+        <span className="text-xs text-gray-400">{totalUnchecked} to buy</span>
       </div>
 
       {byCategory.map(({ cat, items }) => (
@@ -225,7 +219,7 @@ export default function ShoppingList({ weekPlan, allIngredients }: Props) {
         </div>
       )}
 
-      {consolidatedHomemade.length > 0 && (
+      {consolidatedHomemade.filter(item => !checked.has(`homemade__${normalizeKey(item.name)}`)).length > 0 && (
         <div className="px-5 py-3">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
             To Make at Home
@@ -246,6 +240,51 @@ export default function ShoppingList({ weekPlan, allIngredients }: Props) {
                 </li>
               ))
             }
+          </ul>
+        </div>
+      )}
+
+      {alreadyHaveCount > 0 && (
+        <div className="px-5 py-3">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+              Already Have ({alreadyHaveCount})
+            </h4>
+            <button
+              onClick={() => setChecked(new Set())}
+              className="text-xs text-gray-300 hover:text-gray-500"
+            >
+              uncheck all
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {checkedRegularItems.map(item => (
+              <li
+                key={item.ingredient.id}
+                className="flex items-start justify-between gap-3 text-sm cursor-pointer group"
+                onClick={() => toggleItem(item.ingredient.id)}
+              >
+                <div className="flex items-start gap-2 flex-1">
+                  <span className="mt-0.5 text-gray-300">☑</span>
+                  <span className="text-gray-300 line-through">{shopName(item.ingredient)}</span>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className="text-gray-300">{item.packagesNeeded}× {item.ingredient.packageInfo.label}</span>
+                </div>
+              </li>
+            ))}
+            {checkedHomemadeItems.map(item => (
+              <li
+                key={item.name}
+                className="flex items-center gap-2 text-sm cursor-pointer group"
+                onClick={() => toggleItem(`homemade__${normalizeKey(item.name)}`)}
+              >
+                <span className="text-gray-300">☑</span>
+                <span className="text-gray-300 line-through">
+                  {item.countable && item.qty > 1 ? `${item.name} × ${item.qty}` : item.name}
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       )}

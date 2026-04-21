@@ -169,14 +169,14 @@ export async function planWeek(params: {
     system: [
       {
         type: 'text',
-        text: `You are a meal bowl planning assistant. Plan a varied, cost-conscious week of bowls.
+        text: `You are a meal bowl planning assistant. Plan a varied, cost-conscious week of bowls for a shopper at Trader Joe's.
 
 Rules:
 - Only use ingredient names EXACTLY as listed in the menu below.
 - Vary proteins across bowls (no same protein twice unless unavoidable).
 - Vary flavor profiles across bowls.
-- Reuse perishables (e.g. same cheese across 2 bowls) to reduce waste.
-- Mix plant-based and meat proteins for cost balance (steak/shrimp max once).
+- Reuse perishables across bowls to minimize waste — e.g. if you use feta in one bowl, try to use it again; same for cheese, open jars, fresh herbs, and block proteins like salmon or chicken that come in packages with 3–5 servings.
+- Mix plant-based and meat proteins for cost balance (steak/shrimp max once per week).
 - Each bowl: 1 carb, 1 protein, 1–2 sauces, 2–5 toppings from fruit_veg/nuts_seeds/cheese/finishing/marinade.
 - flavorProfile must be one of: Mexican, Asian, Mediterranean, Greek, Indian, American, Japanese, Thai, Middle Eastern, Mixed.
 - Respond ONLY with a valid JSON array of bowl objects.
