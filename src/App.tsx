@@ -47,7 +47,7 @@ export default function App() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suppressRemote = useRef(false);
 
-  const hasApiKey = !!import.meta.env.VITE_ANTHROPIC_API_KEY;
+  const hasApiKey = import.meta.env.VITE_ENABLE_AI === 'true';
 
   // Load from Supabase on mount + subscribe to real-time changes
   useEffect(() => {

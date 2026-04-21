@@ -1,10 +1,24 @@
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
 import type { Ingredient, FlavorProfile } from '../types';
 
-function getClient(): Anthropic | null {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
-  return new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+type MessageParams = {
+  model: string;
+  max_tokens: number;
+  system: string | { type: 'text'; text: string; cache_control?: { type: 'ephemeral' } }[];
+  messages: { role: 'user' | 'assistant'; content: string }[];
+};
+
+async function callClaude(params: MessageParams): Promise<{ content: Anthropic.ContentBlock[] }> {
+  const res = await fetch('/api/claude-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error ?? `AI request failed (${res.status})`);
+  }
+  return res.json();
 }
 
 function ingredientSummary(i: Ingredient) {
@@ -37,13 +51,10 @@ export async function detectFlavorProfile(params: {
   sauces: Ingredient[];
   toppings: Ingredient[];
 }): Promise<FlavorResult> {
-  const client = getClient();
-  if (!client) throw new Error('No API key configured');
-
   const desc = bowlDescription(params);
   if (!desc) throw new Error('Bowl is empty');
 
-  const response = await client.messages.create({
+  const response = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 300,
     system: [
@@ -83,12 +94,9 @@ export async function getStyleSuggestions(
   stylePrompt: string,
   availableIngredients: Ingredient[]
 ): Promise<StyleSuggestion> {
-  const client = getClient();
-  if (!client) throw new Error('No API key configured');
-
   const ingredientList = availableIngredients.map(ingredientSummary).join('\n');
 
-  const response = await client.messages.create({
+  const response = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 500,
     system: [
@@ -133,9 +141,6 @@ export async function planWeek(params: {
   availableIngredients: Ingredient[];
   existingPlan: { protein: string | null; flavorProfile: string | null }[];
 }): Promise<BowlPlanItem[]> {
-  const client = getClient();
-  if (!client) throw new Error('No API key configured');
-
   const byCategory = (cat: string) =>
     params.availableIngredients
       .filter(i => i.category === cat)
@@ -163,7 +168,7 @@ export async function planWeek(params: {
   if (params.preferences?.fridgeItems) prefLines.push(`Use up from fridge: ${params.preferences.fridgeItems}`);
   const prefBlock = prefLines.length ? `\nPreferences:\n${prefLines.join('\n')}` : '';
 
-  const response = await client.messages.create({
+  const response = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 1500,
     system: [
@@ -212,10 +217,7 @@ export interface IngredientLookup {
 }
 
 export async function lookupIngredientNutrition(name: string): Promise<IngredientLookup> {
-  const client = getClient();
-  if (!client) throw new Error('No API key configured');
-
-  const response = await client.messages.create({
+  const response = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 200,
     system: [
