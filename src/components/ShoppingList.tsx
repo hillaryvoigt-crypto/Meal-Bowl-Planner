@@ -1,6 +1,46 @@
 import { useState } from 'react';
 import type { Bowl, Ingredient, ShoppingLineItem } from '../types';
 
+interface ConsolidatedItem {
+  name: string;
+  qty: number;
+  countable: boolean; // true = show qty (e.g. lemons); false = pantry item (just buy some)
+}
+
+function parseQty(raw: string): { name: string; qty: number; explicit: boolean } {
+  const m = raw.match(/^(.+?)\s*[×x]\s*(\d+)$/i);
+  if (m) return { name: m[1].trim(), qty: parseInt(m[2]), explicit: true };
+  return { name: raw.trim(), qty: 1, explicit: false };
+}
+
+function normalizeKey(name: string): string {
+  return name.toLowerCase().replace(/s$/, '');
+}
+
+function consolidateHomemade(items: ShoppingLineItem[]): ConsolidatedItem[] {
+  const acc = new Map<string, { name: string; qty: number; hasExplicit: boolean }>();
+
+  for (const item of items) {
+    for (const sub of item.ingredient.shoppingItems ?? []) {
+      const { name, qty, explicit } = parseQty(sub);
+      const key = normalizeKey(name);
+      const existing = acc.get(key);
+      if (existing) {
+        existing.qty += qty;
+        if (explicit) { existing.hasExplicit = true; existing.name = name; }
+      } else {
+        acc.set(key, { name, qty, hasExplicit: explicit });
+      }
+    }
+  }
+
+  return Array.from(acc.values()).map(({ name, qty, hasExplicit }) => ({
+    name,
+    qty,
+    countable: hasExplicit,
+  }));
+}
+
 interface Props {
   weekPlan: Bowl[];
   allIngredients: Ingredient[];
@@ -107,9 +147,11 @@ export default function ShoppingList({ weekPlan, allIngredients }: Props) {
     i => (i.ingredient.category === 'sauce' || i.ingredient.category === 'marinade') && !checked.has(i.ingredient.id)
   );
 
+  const consolidatedHomemade = consolidateHomemade(homemadeItems);
+
   const totalUnchecked =
     regularItems.filter(i => !checked.has(i.ingredient.id)).length +
-    homemadeItems.flatMap(item => (item.ingredient.shoppingItems ?? []).map(sub => `${item.ingredient.id}__${sub}`)).filter(key => !checked.has(key)).length;
+    consolidatedHomemade.filter(item => !checked.has(`homemade__${normalizeKey(item.name)}`)).length;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
@@ -183,35 +225,28 @@ export default function ShoppingList({ weekPlan, allIngredients }: Props) {
         </div>
       )}
 
-      {homemadeItems.length > 0 && (
+      {consolidatedHomemade.length > 0 && (
         <div className="px-5 py-3">
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
             To Make at Home
           </h4>
-          <div className="space-y-4">
-            {homemadeItems.map(item => {
-              const allSubs = item.ingredient.shoppingItems ?? [];
-              const visibleSubs = allSubs.filter(sub => !checked.has(`${item.ingredient.id}__${sub}`));
-              if (visibleSubs.length === 0) return null;
-              return (
-                <div key={item.ingredient.id}>
-                  <p className="text-sm font-medium text-gray-700 mb-1.5">{item.ingredient.name}</p>
-                  <ul className="space-y-1.5 pl-1">
-                    {visibleSubs.map(sub => (
-                      <li
-                        key={sub}
-                        className="flex items-center gap-2 text-sm cursor-pointer group"
-                        onClick={() => toggleItem(`${item.ingredient.id}__${sub}`)}
-                      >
-                        <span className="text-gray-300 group-hover:text-bowl-green transition-colors">☐</span>
-                        <span className="text-gray-700">{sub}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
+          <ul className="space-y-2">
+            {consolidatedHomemade
+              .filter(item => !checked.has(`homemade__${normalizeKey(item.name)}`))
+              .map(item => (
+                <li
+                  key={item.name}
+                  className="flex items-center gap-2 text-sm cursor-pointer group"
+                  onClick={() => toggleItem(`homemade__${normalizeKey(item.name)}`)}
+                >
+                  <span className="text-gray-300 group-hover:text-bowl-green transition-colors">☐</span>
+                  <span className="text-gray-700">
+                    {item.countable && item.qty > 1 ? `${item.name} × ${item.qty}` : item.name}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
         </div>
       )}
     </div>
