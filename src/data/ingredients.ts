@@ -166,7 +166,7 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
   },
   {
     id: 'fried-egg',
-    name: 'Fried / Soft-Boiled Egg',
+    name: 'Eggs',
     category: 'protein',
     protein: 6,
     calories: 90,
