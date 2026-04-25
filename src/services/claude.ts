@@ -1,24 +1,24 @@
-import type Anthropic from '@anthropic-ai/sdk';
 import type { Ingredient, FlavorProfile } from '../types';
 
-type MessageParams = {
+type MessageParam = {
   model: string;
   max_tokens: number;
-  system: string | { type: 'text'; text: string; cache_control?: { type: 'ephemeral' } }[];
+  system: { type: 'text'; text: string; cache_control?: { type: 'ephemeral' } }[];
   messages: { role: 'user' | 'assistant'; content: string }[];
 };
 
-async function callClaude(params: MessageParams): Promise<{ content: Anthropic.ContentBlock[] }> {
+async function callClaude(params: MessageParam): Promise<string> {
   const res = await fetch('/api/claude-proxy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new Error(err.error ?? `AI request failed (${res.status})`);
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error ?? 'AI request failed');
   }
-  return res.json();
+  const data = await res.json() as { content: { type: string; text: string }[] };
+  return data.content[0]?.type === 'text' ? data.content[0].text : '';
 }
 
 function ingredientSummary(i: Ingredient) {
@@ -54,7 +54,7 @@ export async function detectFlavorProfile(params: {
   const desc = bowlDescription(params);
   if (!desc) throw new Error('Bowl is empty');
 
-  const response = await callClaude({
+  const text = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 300,
     system: [
@@ -68,15 +68,9 @@ description should be 1 sentence, evocative.`,
         cache_control: { type: 'ephemeral' },
       },
     ],
-    messages: [
-      {
-        role: 'user',
-        content: `Analyze this bowl:\n${desc}\n\nRespond with JSON only.`,
-      },
-    ],
+    messages: [{ role: 'user', content: `Analyze this bowl:\n${desc}\n\nRespond with JSON only.` }],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Invalid response from AI');
   return JSON.parse(jsonMatch[0]) as FlavorResult;
@@ -96,7 +90,7 @@ export async function getStyleSuggestions(
 ): Promise<StyleSuggestion> {
   const ingredientList = availableIngredients.map(ingredientSummary).join('\n');
 
-  const response = await callClaude({
+  const text = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 500,
     system: [
@@ -119,7 +113,6 @@ Respond ONLY with valid JSON matching exactly:
     ],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Invalid response from AI');
   return JSON.parse(jsonMatch[0]) as StyleSuggestion;
@@ -168,7 +161,7 @@ export async function planWeek(params: {
   if (params.preferences?.fridgeItems) prefLines.push(`Use up from fridge: ${params.preferences.fridgeItems}`);
   const prefBlock = prefLines.length ? `\nPreferences:\n${prefLines.join('\n')}` : '';
 
-  const response = await callClaude({
+  const text = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 1500,
     system: [
@@ -203,7 +196,6 @@ Respond with a JSON array only, no other text:
     ],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
   const jsonMatch = text.match(/\[[\s\S]*\]/);
   if (!jsonMatch) throw new Error('Invalid response from AI');
   return JSON.parse(jsonMatch[0]) as BowlPlanItem[];
@@ -217,7 +209,7 @@ export interface IngredientLookup {
 }
 
 export async function lookupIngredientNutrition(name: string): Promise<IngredientLookup> {
-  const response = await callClaude({
+  const text = await callClaude({
     model: 'claude-sonnet-4-6',
     max_tokens: 200,
     system: [
@@ -231,15 +223,9 @@ Respond ONLY with valid JSON: {"protein": number, "calories": number, "serving":
         cache_control: { type: 'ephemeral' },
       },
     ],
-    messages: [
-      {
-        role: 'user',
-        content: `Ingredient: "${name}"\nRespond with JSON only.`,
-      },
-    ],
+    messages: [{ role: 'user', content: `Ingredient: "${name}"\nRespond with JSON only.` }],
   });
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : '';
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Invalid response from AI');
   return JSON.parse(jsonMatch[0]) as IngredientLookup;
