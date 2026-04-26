@@ -30,6 +30,7 @@ export interface Ingredient {
   recipe?: string;       // for sauces: short recipe note
   shoppingItems?: string[]; // grocery items to buy to make this (homemade sauces/marinades)
   perishable?: boolean;  // false = dry staple or frozen; omitted/true = fresh/refrigerated
+  suggestedFor?: MealFormat[]; // which meal formats this base ingredient is suited for
   isCustom?: boolean;
 }
 

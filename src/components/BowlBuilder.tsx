@@ -49,8 +49,13 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
   const [addModalCategory, setAddModalCategory] = useState<Ingredient['category'] | null>(null);
   const [editingCategory, setEditingCategory] = useState<Ingredient['category'] | null>(null);
 
-  const byCategory = (cat: Ingredient['category']) =>
-    ingredients.filter(i => i.category === cat);
+  const byCategory = (cat: Ingredient['category']) => {
+    const items = ingredients.filter(i => i.category === cat);
+    if (cat === 'carb') {
+      return items.filter(i => !i.suggestedFor || i.suggestedFor.includes(mealFormat));
+    }
+    return items;
+  };
 
   const totalProtein = computeProtein(carb, protein, sauces, toppings);
   const totalCalories = computeCalories(carb, protein, sauces, toppings);
