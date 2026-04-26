@@ -14,7 +14,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       id: 'example-mediterranean',
       name: 'Mediterranean Goddess',
       servings: 2,
-      carb: find(ingredients, 'farro'),
+      carbs: [find(ingredients, 'farro')].filter((i): i is Ingredient => i !== null),
       protein: find(ingredients, 'chicken-breast'),
       sauces: findAll(ingredients, ['tahini-sauce', 'tzatziki']),
       toppings: findAll(ingredients, [
@@ -31,7 +31,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       id: 'example-mexican',
       name: 'Mexican Street Bowl',
       servings: 2,
-      carb: find(ingredients, 'brown-rice'),
+      carbs: [find(ingredients, 'brown-rice')].filter((i): i is Ingredient => i !== null),
       protein: find(ingredients, 'steak-strips'),
       sauces: findAll(ingredients, ['pico-de-gallo', 'chipotle-sauce']),
       toppings: findAll(ingredients, [
@@ -48,7 +48,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       id: 'example-japanese',
       name: 'Tokyo Teriyaki Bowl',
       servings: 2,
-      carb: find(ingredients, 'brown-rice'),
+      carbs: [find(ingredients, 'brown-rice')].filter((i): i is Ingredient => i !== null),
       protein: find(ingredients, 'salmon'),
       sauces: findAll(ingredients, ['teriyaki-sauce', 'soy-sesame-dressing']),
       toppings: findAll(ingredients, [
@@ -66,7 +66,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       id: 'example-thai',
       name: 'Thai Peanut Noodle Bowl',
       servings: 2,
-      carb: find(ingredients, 'rice-noodles'),
+      carbs: [find(ingredients, 'rice-noodles')].filter((i): i is Ingredient => i !== null),
       protein: find(ingredients, 'shrimp'),
       sauces: findAll(ingredients, ['peanut-sauce']),
       toppings: findAll(ingredients, [
@@ -84,7 +84,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       id: 'example-greek',
       name: 'Greek Power Bowl',
       servings: 2,
-      carb: find(ingredients, 'farro'),
+      carbs: [find(ingredients, 'farro')].filter((i): i is Ingredient => i !== null),
       protein: find(ingredients, 'chickpeas'),
       sauces: findAll(ingredients, ['hummus', 'tzatziki']),
       toppings: findAll(ingredients, [

@@ -17,29 +17,29 @@ interface Props {
 }
 
 function computeProtein(
-  carb: Ingredient | null,
+  carbs: Ingredient[],
   protein: Ingredient | null,
   sauces: Ingredient[],
   toppings: Ingredient[]
 ): number {
-  const items = [carb, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
+  const items = [...carbs, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
   return Math.round(items.reduce((sum, i) => sum + i.protein, 0) * 10) / 10;
 }
 
 function computeCalories(
-  carb: Ingredient | null,
+  carbs: Ingredient[],
   protein: Ingredient | null,
   sauces: Ingredient[],
   toppings: Ingredient[]
 ): number {
-  const items = [carb, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
+  const items = [...carbs, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
   return Math.round(items.reduce((sum, i) => sum + i.calories, 0));
 }
 
 export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAddToWeek, onSaveBowl, onAddIngredient, onRemoveIngredient }: Props) {
   const [bowlName, setBowlName] = useState(initialBowl?.name ?? '');
   const [servings, setServings] = useState<1 | 2>(initialBowl?.servings ?? 2);
-  const [carb, setCarb] = useState<Ingredient | null>(initialBowl?.carb ?? null);
+  const [carbs, setCarbs] = useState<Ingredient[]>(initialBowl?.carbs ?? []);
   const [protein, setProtein] = useState<Ingredient | null>(initialBowl?.protein ?? null);
   const [sauces, setSauces] = useState<Ingredient[]>(initialBowl?.sauces ?? []);
   const [toppings, setToppings] = useState<Ingredient[]>(initialBowl?.toppings ?? []);
@@ -59,11 +59,13 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
     return items;
   };
 
-  const totalProtein = computeProtein(carb, protein, sauces, toppings);
-  const totalCalories = computeCalories(carb, protein, sauces, toppings);
+  const totalProtein = computeProtein(carbs, protein, sauces, toppings);
+  const totalCalories = computeCalories(carbs, protein, sauces, toppings);
 
   function toggleCarb(ing: Ingredient) {
-    setCarb(prev => (prev?.id === ing.id ? null : ing));
+    setCarbs(prev =>
+      prev.find(c => c.id === ing.id) ? prev.filter(c => c.id !== ing.id) : [...prev, ing]
+    );
   }
 
   function toggleProtein(ing: Ingredient) {
@@ -93,7 +95,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
     sauces: Ingredient[];
     toppings: Ingredient[];
   }) {
-    if (params.carb) setCarb(params.carb);
+    if (params.carb) setCarbs(prev => prev.find(c => c.id === params.carb!.id) ? prev : [...prev, params.carb!]);
     if (params.protein) setProtein(params.protein);
     if (params.sauces.length) setSauces(params.sauces);
     if (params.toppings.length) setToppings(params.toppings);
@@ -105,7 +107,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
       name: bowlName,
       servings,
       mealFormat,
-      carb,
+      carbs,
       protein,
       sauces,
       toppings,
@@ -125,7 +127,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
   }
 
   function resetBowl() {
-    setCarb(null);
+    setCarbs([]);
     setProtein(null);
     setSauces([]);
     setToppings([]);
@@ -133,7 +135,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
     setBowlName('');
   }
 
-  const isEmpty = !carb && !protein && !sauces.length && !toppings.length;
+  const isEmpty = !carbs.length && !protein && !sauces.length && !toppings.length;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -168,7 +170,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
         </div>
 
         {[
-          { category: 'carb' as const, label: 'Base', multi: false, selected: carb ? [carb.id] : [], onToggle: toggleCarb },
+          { category: 'carb' as const, label: 'Base', multi: true, selected: carbs.map(c => c.id), onToggle: toggleCarb },
           { category: 'protein' as const, label: 'Protein', multi: false, selected: protein ? [protein.id] : [], onToggle: toggleProtein },
           { category: 'marinade' as const, label: 'Glazes & Marinades', multi: true, selected: toppings.filter(t => t.category === 'marinade').map(t => t.id), onToggle: toggleTopping },
           { category: 'sauce' as const, label: 'Sauces', multi: true, selected: sauces.map(s => s.id), onToggle: toggleSauce },
@@ -266,7 +268,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Bowl Summary</h3>
             <dl className="text-sm space-y-1">
-              {carb && <div className="flex justify-between"><dt className="text-gray-500">Carb</dt><dd className="font-medium text-gray-800">{carb.name}</dd></div>}
+              {carbs.length > 0 && <div className="flex justify-between"><dt className="text-gray-500">Base</dt><dd className="font-medium text-gray-800 text-right">{carbs.map(c => c.name).join(', ')}</dd></div>}
               {protein && <div className="flex justify-between"><dt className="text-gray-500">Protein</dt><dd className="font-medium text-gray-800">{protein.name}</dd></div>}
               {sauces.length > 0 && (
                 <div className="flex justify-between">
@@ -291,7 +293,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
         {/* AI Flavor Assistant */}
         <FlavorAssistant
           hasApiKey={hasApiKey}
-          carb={carb}
+          carbs={carbs}
           protein={protein}
           sauces={sauces}
           toppings={toppings}

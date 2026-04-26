@@ -39,7 +39,7 @@ export interface Bowl {
   name: string;
   servings: 1 | 2;
   mealFormat?: MealFormat; // optional for backward compat; undefined = 'bowl'
-  carb: Ingredient | null;
+  carbs: Ingredient[];
   protein: Ingredient | null;
   sauces: Ingredient[];
   toppings: Ingredient[];

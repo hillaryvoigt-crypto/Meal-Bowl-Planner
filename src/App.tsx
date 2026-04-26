@@ -16,14 +16,25 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
-function usePersistedState<T>(key: string, initial: T): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const [state, setState] = useState<T>(() => loadFromStorage(key, initial));
+function usePersistedState<T>(key: string, initial: T, transform?: (raw: any) => T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    const raw = loadFromStorage<any>(key, initial);
+    return transform ? transform(raw) : raw as T;
+  });
 
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(state));
   }, [key, state]);
 
   return [state, setState];
+}
+
+// Migrate bowls saved with old `carb: Ingredient | null` to `carbs: Ingredient[]`
+function normalizeBowl(raw: any): Bowl {
+  if (!Array.isArray(raw.carbs)) {
+    return { ...raw, carbs: raw.carb ? [raw.carb] : [] };
+  }
+  return raw as Bowl;
 }
 
 const TABS: { id: Tab; label: string; emoji: string }[] = [
@@ -37,8 +48,8 @@ export default function App() {
   const [customIngredients, setCustomIngredients] = usePersistedState<Ingredient[]>('bowl-custom-ingredients', []);
   const [hiddenIngredientIds, setHiddenIngredientIds] = usePersistedState<string[]>('bowl-hidden-ingredients', []);
   const ingredients = [...DEFAULT_INGREDIENTS, ...customIngredients].filter(i => !hiddenIngredientIds.includes(i.id));
-  const [weekPlan, setWeekPlan] = usePersistedState<Bowl[]>('bowl-week-plan', []);
-  const [savedBowls, setSavedBowls] = usePersistedState<Bowl[]>('bowl-saved', []);
+  const [weekPlan, setWeekPlan] = usePersistedState<Bowl[]>('bowl-week-plan', [], (r: any[]) => r.map(normalizeBowl));
+  const [savedBowls, setSavedBowls] = usePersistedState<Bowl[]>('bowl-saved', [], (r: any[]) => r.map(normalizeBowl));
   const [builderKey, setBuilderKey] = useState(0);
   const [loadedBowl, setLoadedBowl] = useState<Bowl | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
@@ -54,8 +65,8 @@ export default function App() {
     loadSync(syncCode).then(data => {
       if (data) {
         suppressRemote.current = true;
-        setWeekPlan(data.weekPlan);
-        setSavedBowls(data.savedBowls);
+        setWeekPlan(data.weekPlan.map(normalizeBowl));
+        setSavedBowls(data.savedBowls.map(normalizeBowl));
         setTimeout(() => { suppressRemote.current = false; }, 2000);
       }
     });

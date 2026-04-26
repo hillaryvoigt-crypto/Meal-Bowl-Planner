@@ -63,7 +63,7 @@ function buildShoppingList(bowls: Bowl[], freshIngredients: Ingredient[]): Shopp
 
   for (const bowl of bowls) {
     const bowlIngredients = [
-      bowl.carb,
+      ...(bowl.carbs ?? []),
       bowl.protein,
       ...bowl.sauces,
       ...bowl.toppings,

@@ -83,11 +83,11 @@ function SavedBowlCard({
                 {bowl.flavorProfile}
               </span>
             )}
-            {bowl.carb && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                {bowl.carb.name}
+            {bowl.carbs?.map(c => (
+              <span key={c.id} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                {c.name}
               </span>
-            )}
+            ))}
             {bowl.protein && (
               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                 {bowl.protein.name}

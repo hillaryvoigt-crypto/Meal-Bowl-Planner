@@ -106,7 +106,7 @@ function BowlCard({ bowl, onRemove, onLoad, onSave }: { bowl: Bowl; onRemove: ()
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1.5 text-sm text-gray-600">
-            {bowl.carb && <span>{bowl.carb.name}</span>}
+            {bowl.carbs?.length > 0 && <span>{bowl.carbs.map(c => c.name).join(', ')}</span>}
             {bowl.protein && <span className="font-medium">{bowl.protein.name}</span>}
           </div>
 

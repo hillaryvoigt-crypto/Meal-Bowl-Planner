@@ -58,7 +58,7 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
           name: plan.name,
           flavorProfile: plan.flavorProfile,
           servings: 2,
-          carb,
+          carbs: carb ? [carb] : [],
           protein,
           sauces,
           toppings,
