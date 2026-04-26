@@ -33,7 +33,7 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
     setError('');
     try {
       const existingSummary = existingPlan.map(b => ({
-        protein: b.protein?.name ?? null,
+        protein: b.proteins?.[0]?.name ?? null,
         flavorProfile: b.flavorProfile,
       }));
 
@@ -59,7 +59,7 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
           flavorProfile: plan.flavorProfile,
           servings: 2,
           carbs: carb ? [carb] : [],
-          protein,
+          proteins: protein ? [protein] : [],
           sauces,
           toppings,
           totalProtein,

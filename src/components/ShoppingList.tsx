@@ -64,10 +64,10 @@ function buildShoppingList(bowls: Bowl[], freshIngredients: Ingredient[]): Shopp
   for (const bowl of bowls) {
     const bowlIngredients = [
       ...(bowl.carbs ?? []),
-      bowl.protein,
+      ...(bowl.proteins ?? []),
       ...bowl.sauces,
       ...bowl.toppings,
-    ].filter(Boolean) as Ingredient[];
+    ];
 
     for (const stored of bowlIngredients) {
       // Always use the fresh ingredient data so shoppingItems / shopAs stay current

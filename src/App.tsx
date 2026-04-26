@@ -31,10 +31,9 @@ function usePersistedState<T>(key: string, initial: T, transform?: (raw: any) =>
 
 // Migrate bowls saved with old `carb: Ingredient | null` to `carbs: Ingredient[]`
 function normalizeBowl(raw: any): Bowl {
-  if (!Array.isArray(raw.carbs)) {
-    return { ...raw, carbs: raw.carb ? [raw.carb] : [] };
-  }
-  return raw as Bowl;
+  const carbs = Array.isArray(raw.carbs) ? raw.carbs : raw.carb ? [raw.carb] : [];
+  const proteins = Array.isArray(raw.proteins) ? raw.proteins : raw.protein ? [raw.protein] : [];
+  return { ...raw, carbs, proteins };
 }
 
 const TABS: { id: Tab; label: string; emoji: string }[] = [

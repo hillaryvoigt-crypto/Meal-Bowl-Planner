@@ -40,7 +40,7 @@ export interface Bowl {
   servings: 1 | 2;
   mealFormat?: MealFormat; // optional for backward compat; undefined = 'bowl'
   carbs: Ingredient[];
-  protein: Ingredient | null;
+  proteins: Ingredient[];
   sauces: Ingredient[];
   toppings: Ingredient[];
   flavorProfile: FlavorProfile;

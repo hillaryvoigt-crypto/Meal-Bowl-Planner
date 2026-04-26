@@ -15,7 +15,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       name: 'Mediterranean Goddess',
       servings: 2,
       carbs: [find(ingredients, 'farro')].filter((i): i is Ingredient => i !== null),
-      protein: find(ingredients, 'chicken-breast'),
+      proteins: [find(ingredients, 'chicken-breast')].filter((i): i is Ingredient => i !== null),
       sauces: findAll(ingredients, ['tahini-sauce', 'tzatziki']),
       toppings: findAll(ingredients, [
         'arugula', 'cherry-tomatoes', 'cucumber',
@@ -32,7 +32,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       name: 'Mexican Street Bowl',
       servings: 2,
       carbs: [find(ingredients, 'brown-rice')].filter((i): i is Ingredient => i !== null),
-      protein: find(ingredients, 'steak-strips'),
+      proteins: [find(ingredients, 'steak-strips')].filter((i): i is Ingredient => i !== null),
       sauces: findAll(ingredients, ['pico-de-gallo', 'chipotle-sauce']),
       toppings: findAll(ingredients, [
         'avocado', 'roasted-corn', 'red-onion',
@@ -49,7 +49,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       name: 'Tokyo Teriyaki Bowl',
       servings: 2,
       carbs: [find(ingredients, 'brown-rice')].filter((i): i is Ingredient => i !== null),
-      protein: find(ingredients, 'salmon'),
+      proteins: [find(ingredients, 'salmon')].filter((i): i is Ingredient => i !== null),
       sauces: findAll(ingredients, ['teriyaki-sauce', 'soy-sesame-dressing']),
       toppings: findAll(ingredients, [
         'cucumber', 'shredded-carrots', 'kimchi',
@@ -67,7 +67,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       name: 'Thai Peanut Noodle Bowl',
       servings: 2,
       carbs: [find(ingredients, 'rice-noodles')].filter((i): i is Ingredient => i !== null),
-      protein: find(ingredients, 'shrimp'),
+      proteins: [find(ingredients, 'shrimp')].filter((i): i is Ingredient => i !== null),
       sauces: findAll(ingredients, ['peanut-sauce']),
       toppings: findAll(ingredients, [
         'shredded-carrots', 'roasted-broccoli', 'baby-spinach',
@@ -85,7 +85,7 @@ export function buildExampleBowls(ingredients: Ingredient[]): Bowl[] {
       name: 'Greek Power Bowl',
       servings: 2,
       carbs: [find(ingredients, 'farro')].filter((i): i is Ingredient => i !== null),
-      protein: find(ingredients, 'chickpeas'),
+      proteins: [find(ingredients, 'chickpeas')].filter((i): i is Ingredient => i !== null),
       sauces: findAll(ingredients, ['hummus', 'tzatziki']),
       toppings: findAll(ingredients, [
         'cucumber', 'cherry-tomatoes', 'red-onion', 'roasted-bell-pepper',

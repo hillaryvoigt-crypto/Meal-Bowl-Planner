@@ -6,7 +6,7 @@ import { FLAVOR_COLORS } from '../data/ingredients';
 interface Props {
   hasApiKey: boolean;
   carbs: Ingredient[];
-  protein: Ingredient | null;
+  proteins: Ingredient[];
   sauces: Ingredient[];
   toppings: Ingredient[];
   allIngredients: Ingredient[];
@@ -23,7 +23,7 @@ interface Props {
 export default function FlavorAssistant({
   hasApiKey,
   carbs,
-  protein,
+  proteins,
   sauces,
   toppings,
   allIngredients,
@@ -32,12 +32,13 @@ export default function FlavorAssistant({
   onFlavorDetected,
 }: Props) {
   const carb = carbs[0] ?? null;
+  const protein = proteins[0] ?? null;
   const [styleInput, setStyleInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [suggestion, setSuggestion] = useState<string>('');
 
-  const bowlHasIngredients = !!(carbs.length || protein || sauces.length || toppings.length);
+  const bowlHasIngredients = !!(carbs.length || proteins.length || sauces.length || toppings.length);
 
   async function handleDetect() {
     setLoading(true);
