@@ -50,7 +50,9 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
   const [editingCategory, setEditingCategory] = useState<Ingredient['category'] | null>(null);
 
   const byCategory = (cat: Ingredient['category']) => {
-    const items = ingredients.filter(i => i.category === cat);
+    const items = ingredients
+      .filter(i => i.category === cat)
+      .sort((a, b) => a.name.localeCompare(b.name));
     if (cat === 'carb') {
       return items.filter(i => !i.suggestedFor || i.suggestedFor.includes(mealFormat));
     }
