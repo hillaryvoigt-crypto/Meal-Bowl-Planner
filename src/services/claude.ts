@@ -205,6 +205,7 @@ export interface IngredientLookup {
   protein: number;
   calories: number;
   serving: string;
+  category: string;
   flavorTags: string[];
 }
 
@@ -216,9 +217,10 @@ export async function lookupIngredientNutrition(name: string): Promise<Ingredien
       {
         type: 'text',
         text: `You provide nutritional estimates for food ingredients used in meal bowls.
-Respond ONLY with valid JSON: {"protein": number, "calories": number, "serving": string, "flavorTags": string[]}
+Respond ONLY with valid JSON: {"protein": number, "calories": number, "serving": string, "category": string, "flavorTags": string[]}
 - protein and calories are per typical single serving
 - serving is a human-readable string like "1 cup" or "4 oz"
+- category: one of: carb, protein, sauce, fruit_veg, nuts_seeds, cheese, finishing, marinade
 - flavorTags: 1–3 lowercase strings from: mexican, asian, japanese, thai, mediterranean, greek, indian, middle-eastern, american, neutral`,
         cache_control: { type: 'ephemeral' },
       },

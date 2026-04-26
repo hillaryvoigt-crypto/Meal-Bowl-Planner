@@ -52,6 +52,9 @@ export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, 
       setProtein(String(result.protein));
       setCalories(String(result.calories));
       setServing(result.serving);
+      if (result.category && CATEGORIES.some(c => c.value === result.category)) {
+        setCategory(result.category as Category);
+      }
       setAiBaseline({ protein: result.protein, calories: result.calories, serving: result.serving });
     } catch {
       setAiError('AI lookup failed. Please fill in manually.');
