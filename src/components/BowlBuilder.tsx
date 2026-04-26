@@ -332,7 +332,15 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
         <AddIngredientModal
           hasApiKey={hasApiKey}
           defaultCategory={addModalCategory ?? undefined}
-          onAdd={onAddIngredient}
+          onAdd={(ing) => {
+            // If adding a base ingredient from within the Base section edit mode,
+            // tag it for the current meal format so it doesn't bleed into other formats
+            if (ing.category === 'carb' && addModalCategory === 'carb') {
+              onAddIngredient({ ...ing, suggestedFor: [mealFormat] });
+            } else {
+              onAddIngredient(ing);
+            }
+          }}
           onClose={() => { setShowAddModal(false); setAddModalCategory(null); }}
         />
       )}
