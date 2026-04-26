@@ -20,6 +20,15 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'marinade', label: 'Marinade' },
 ];
 
+// Parse the leading number from a serving string, handling unicode fractions
+function parseServingNumber(serving: string): number | null {
+  const fracs: Record<string, number> = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 1/3, '⅔': 2/3, '⅛': 0.125 };
+  let s = serving.trim();
+  for (const [sym, val] of Object.entries(fracs)) s = s.replace(sym, String(val));
+  const m = s.match(/^(\d+\.?\d*)/);
+  return m ? parseFloat(m[1]) : null;
+}
+
 export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, onClose }: Props) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<Category>(defaultCategory ?? 'fruit_veg');
@@ -31,6 +40,8 @@ export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, 
   const [recipe, setRecipe] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  // Baseline from AI fill — used to scale protein/calories when user adjusts serving
+  const [aiBaseline, setAiBaseline] = useState<{ protein: number; calories: number; serving: string } | null>(null);
 
   async function handleAIFill() {
     if (!name.trim()) return;
@@ -41,10 +52,23 @@ export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, 
       setProtein(String(result.protein));
       setCalories(String(result.calories));
       setServing(result.serving);
+      setAiBaseline({ protein: result.protein, calories: result.calories, serving: result.serving });
     } catch {
       setAiError('AI lookup failed. Please fill in manually.');
     } finally {
       setAiLoading(false);
+    }
+  }
+
+  function handleServingChange(newServing: string) {
+    setServing(newServing);
+    if (!aiBaseline) return;
+    const baseAmt = parseServingNumber(aiBaseline.serving);
+    const newAmt = parseServingNumber(newServing);
+    if (baseAmt && newAmt && baseAmt > 0) {
+      const ratio = newAmt / baseAmt;
+      setProtein(String(Math.round(aiBaseline.protein * ratio * 10) / 10));
+      setCalories(String(Math.round(aiBaseline.calories * ratio)));
     }
   }
 
@@ -157,10 +181,15 @@ export default function AddIngredientModal({ hasApiKey, defaultCategory, onAdd, 
             <input
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bowl-green"
               value={serving}
-              onChange={e => setServing(e.target.value)}
+              onChange={e => handleServingChange(e.target.value)}
               placeholder="e.g. 1 cup or 4 oz"
               required
             />
+            {aiBaseline && (
+              <p className="text-xs text-gray-400 mt-1">
+                Protein &amp; calories scale automatically when you adjust the serving size.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

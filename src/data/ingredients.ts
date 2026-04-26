@@ -1,7 +1,7 @@
 import type { Ingredient } from '../types';
 
 export const DEFAULT_INGREDIENTS: Ingredient[] = [
-  // ── CARBS (alphabetical by sort key, ignoring prep modifiers) ─────
+  // ── CARBS / BASE (alphabetical by sort key, ignoring prep modifiers) ─
   {
     id: 'basmati-rice',
     name: 'Basmati Rice',
@@ -68,6 +68,39 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['neutral', 'american', 'mediterranean'],
   },
   {
+    id: 'fettuccine',
+    name: 'Fettuccine',
+    category: 'carb',
+    protein: 7,
+    calories: 200,
+    serving: '2 oz dry',
+    packageInfo: { label: '16 oz box', servingsPerPackage: 8 },
+    flavorTags: ['italian', 'mediterranean'],
+    perishable: false,
+  },
+  {
+    id: 'orzo',
+    name: 'Orzo',
+    category: 'carb',
+    protein: 6,
+    calories: 210,
+    serving: '2 oz dry',
+    packageInfo: { label: '16 oz box', servingsPerPackage: 8 },
+    flavorTags: ['italian', 'mediterranean', 'greek'],
+    perishable: false,
+  },
+  {
+    id: 'penne',
+    name: 'Penne',
+    category: 'carb',
+    protein: 7,
+    calories: 200,
+    serving: '2 oz dry',
+    packageInfo: { label: '16 oz box', servingsPerPackage: 8 },
+    flavorTags: ['italian', 'mediterranean'],
+    perishable: false,
+  },
+  {
     id: 'rice-noodles',
     name: 'Rice Noodles',
     category: 'carb',
@@ -76,6 +109,17 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     serving: '½ cup cooked',
     packageInfo: { label: '8 oz package', servingsPerPackage: 8 },
     flavorTags: ['asian', 'thai'],
+    perishable: false,
+  },
+  {
+    id: 'spaghetti',
+    name: 'Spaghetti',
+    category: 'carb',
+    protein: 7,
+    calories: 200,
+    serving: '2 oz dry',
+    packageInfo: { label: '16 oz box', servingsPerPackage: 8 },
+    flavorTags: ['italian', 'mediterranean'],
     perishable: false,
   },
   {
@@ -247,7 +291,18 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['american', 'mexican', 'neutral'],
   },
 
-  // ── SAUCES (alphabetical) ─────────────────────────────────────────
+  // ── SAUCES & BROTHS (alphabetical) ───────────────────────────────
+  {
+    id: 'chicken-bone-broth',
+    name: 'Chicken Bone Broth',
+    category: 'sauce',
+    protein: 10,
+    calories: 45,
+    serving: '1 cup',
+    packageInfo: { label: '17.6 oz carton', servingsPerPackage: 2 },
+    flavorTags: ['american', 'asian', 'neutral'],
+    perishable: false,
+  },
   {
     id: 'chipotle-sauce',
     name: 'Chipotle Sauce',
@@ -273,6 +328,17 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     shoppingItems: ['Avocado × 1', 'Lime', 'White onion', 'Cilantro'],
   },
   {
+    id: 'coconut-milk',
+    name: 'Coconut Milk',
+    category: 'sauce',
+    protein: 1,
+    calories: 140,
+    serving: '½ cup',
+    packageInfo: { label: '13.5 oz can', servingsPerPackage: 3 },
+    flavorTags: ['thai', 'asian', 'indian'],
+    perishable: false,
+  },
+  {
     id: 'hummus',
     name: 'Hummus',
     category: 'sauce',
@@ -281,6 +347,17 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     serving: '3 tbsp',
     packageInfo: { label: '10 oz container', servingsPerPackage: 6 },
     flavorTags: ['middle-eastern', 'mediterranean', 'greek'],
+  },
+  {
+    id: 'marinara-sauce',
+    name: 'Marinara Sauce',
+    category: 'sauce',
+    protein: 2,
+    calories: 70,
+    serving: '½ cup',
+    packageInfo: { label: '25 oz jar', servingsPerPackage: 6 },
+    flavorTags: ['italian', 'mediterranean'],
+    perishable: false,
   },
   {
     id: 'lime-cilantro-dressing',
@@ -305,6 +382,17 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['asian', 'japanese'],
     recipe: 'Whisk: 2 tbsp white miso, 2 tbsp rice vinegar, 1 tbsp sesame oil, 1 tsp fresh ginger, 1 tsp honey.',
     shoppingItems: ['White miso paste', 'Rice vinegar', 'Sesame oil', 'Fresh ginger', 'Honey'],
+  },
+  {
+    id: 'pesto',
+    name: 'Pesto',
+    category: 'sauce',
+    protein: 3,
+    calories: 130,
+    serving: '2 tbsp',
+    packageInfo: { label: '6.7 oz jar', servingsPerPackage: 6 },
+    flavorTags: ['italian', 'mediterranean'],
+    perishable: false,
   },
   {
     id: 'peanut-sauce',
@@ -343,6 +431,17 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     shoppingItems: ['Soy sauce', 'Rice vinegar', 'Sesame oil', 'Fresh ginger', 'Honey'],
   },
   {
+    id: 'red-curry-paste',
+    name: 'Red Curry Paste',
+    category: 'sauce',
+    protein: 1,
+    calories: 25,
+    serving: '1 tbsp',
+    packageInfo: { label: '4 oz jar', servingsPerPackage: 8 },
+    flavorTags: ['thai', 'asian'],
+    perishable: false,
+  },
+  {
     id: 'sriracha',
     name: 'Sriracha',
     category: 'sauce',
@@ -364,6 +463,28 @@ export const DEFAULT_INGREDIENTS: Ingredient[] = [
     flavorTags: ['mediterranean', 'middle-eastern', 'greek'],
     recipe: 'Whisk: 3 tbsp tahini, 2 tbsp lemon juice, 1 garlic clove (minced), 2–3 tbsp water, salt to taste.',
     shoppingItems: ['Tahini (jar)', 'Lemons × 2', 'Garlic'],
+    perishable: false,
+  },
+  {
+    id: 'vegetable-broth',
+    name: 'Vegetable Broth',
+    category: 'sauce',
+    protein: 1,
+    calories: 15,
+    serving: '1 cup',
+    packageInfo: { label: '32 oz carton', servingsPerPackage: 4 },
+    flavorTags: ['neutral', 'mediterranean'],
+    perishable: false,
+  },
+  {
+    id: 'vodka-sauce',
+    name: 'Vodka Sauce',
+    category: 'sauce',
+    protein: 2,
+    calories: 100,
+    serving: '½ cup',
+    packageInfo: { label: '25 oz jar', servingsPerPackage: 6 },
+    flavorTags: ['italian', 'american'],
     perishable: false,
   },
   {

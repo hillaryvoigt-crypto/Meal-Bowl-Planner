@@ -1,4 +1,4 @@
-import type { Bowl, Ingredient } from '../types';
+import type { Bowl, Ingredient, MealFormat } from '../types';
 import ShoppingList from './ShoppingList';
 import WeekPlannerAssistant from './WeekPlannerAssistant';
 import { FLAVOR_COLORS } from '../data/ingredients';
@@ -66,8 +66,13 @@ export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRem
   );
 }
 
+const FORMAT_EMOJI: Record<MealFormat, string> = {
+  bowl: '🥣', soup: '🍜', pasta: '🍝', 'stir-fry': '🥢', curry: '🍛',
+};
+
 function BowlCard({ bowl, onRemove, onLoad, onSave }: { bowl: Bowl; onRemove: () => void; onLoad: () => void; onSave: () => void }) {
   const flavorColor = bowl.flavorProfile ? FLAVOR_COLORS[bowl.flavorProfile] ?? '' : '';
+  const formatEmoji = FORMAT_EMOJI[bowl.mealFormat ?? 'bowl'];
 
   const allToppings = [
     ...bowl.sauces.map(s => s.name),
@@ -88,6 +93,7 @@ function BowlCard({ bowl, onRemove, onLoad, onSave }: { bowl: Bowl; onRemove: ()
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-base">{formatEmoji}</span>
             <h3 className="font-semibold text-gray-900 truncate">{bowl.name}</h3>
             {bowl.flavorProfile && (
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${flavorColor}`}>

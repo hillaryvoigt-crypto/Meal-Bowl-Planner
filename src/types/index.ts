@@ -1,5 +1,7 @@
 export type Category = 'carb' | 'protein' | 'sauce' | 'fruit_veg' | 'nuts_seeds' | 'cheese' | 'finishing' | 'marinade';
 
+export type MealFormat = 'bowl' | 'soup' | 'pasta' | 'stir-fry' | 'curry';
+
 export type FlavorProfile =
   | 'Mexican'
   | 'Asian'
@@ -35,6 +37,7 @@ export interface Bowl {
   id: string;
   name: string;
   servings: 1 | 2;
+  mealFormat?: MealFormat; // optional for backward compat; undefined = 'bowl'
   carb: Ingredient | null;
   protein: Ingredient | null;
   sauces: Ingredient[];

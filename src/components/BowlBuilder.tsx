@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Bowl, Ingredient, FlavorProfile } from '../types';
+import type { Bowl, Ingredient, FlavorProfile, MealFormat } from '../types';
 import ProteinMeter from './ProteinMeter';
 import IngredientGrid from './IngredientGrid';
 import FlavorAssistant from './FlavorAssistant';
@@ -44,6 +44,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
   const [sauces, setSauces] = useState<Ingredient[]>(initialBowl?.sauces ?? []);
   const [toppings, setToppings] = useState<Ingredient[]>(initialBowl?.toppings ?? []);
   const [flavorProfile, setFlavorProfile] = useState<FlavorProfile>(initialBowl?.flavorProfile ?? null);
+  const [mealFormat, setMealFormat] = useState<MealFormat>(initialBowl?.mealFormat ?? 'bowl');
   const [showAddModal, setShowAddModal] = useState(false);
   const [addModalCategory, setAddModalCategory] = useState<Ingredient['category'] | null>(null);
   const [editingCategory, setEditingCategory] = useState<Ingredient['category'] | null>(null);
@@ -96,6 +97,7 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
       id: `bowl-${Date.now()}`,
       name: bowlName,
       servings,
+      mealFormat,
       carb,
       protein,
       sauces,
@@ -130,8 +132,36 @@ export default function BowlBuilder({ ingredients, hasApiKey, initialBowl, onAdd
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left: Ingredient selector */}
       <div className="lg:col-span-2 space-y-4">
+
+        {/* Meal format selector */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Meal Type</h3>
+          <div className="flex flex-wrap gap-2">
+            {([
+              { id: 'bowl', label: 'Bowl', emoji: '🥣' },
+              { id: 'soup', label: 'Soup', emoji: '🍜' },
+              { id: 'pasta', label: 'Pasta', emoji: '🍝' },
+              { id: 'stir-fry', label: 'Stir Fry', emoji: '🥢' },
+              { id: 'curry', label: 'Curry', emoji: '🍛' },
+            ] as { id: MealFormat; label: string; emoji: string }[]).map(fmt => (
+              <button
+                key={fmt.id}
+                onClick={() => setMealFormat(fmt.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
+                  mealFormat === fmt.id
+                    ? 'bg-bowl-green text-white border-bowl-green shadow-sm'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-bowl-green hover:text-bowl-green'
+                }`}
+              >
+                <span>{fmt.emoji}</span>
+                <span>{fmt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {[
-          { category: 'carb' as const, label: 'Carb', multi: false, selected: carb ? [carb.id] : [], onToggle: toggleCarb },
+          { category: 'carb' as const, label: 'Base', multi: false, selected: carb ? [carb.id] : [], onToggle: toggleCarb },
           { category: 'protein' as const, label: 'Protein', multi: false, selected: protein ? [protein.id] : [], onToggle: toggleProtein },
           { category: 'marinade' as const, label: 'Glazes & Marinades', multi: true, selected: toppings.filter(t => t.category === 'marinade').map(t => t.id), onToggle: toggleTopping },
           { category: 'sauce' as const, label: 'Sauces', multi: true, selected: sauces.map(s => s.id), onToggle: toggleSauce },
