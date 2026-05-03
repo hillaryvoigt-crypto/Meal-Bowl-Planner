@@ -45,20 +45,21 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
       });
 
       const bowls: Bowl[] = plans.map((plan, i) => {
-        const carb = resolveIngredient(plan.carb, availableIngredients);
+        const carbs = resolveIngredients(plan.carbs ?? [], availableIngredients);
         const protein = resolveIngredient(plan.protein, availableIngredients);
         const sauces = resolveIngredients(plan.sauces, availableIngredients);
         const toppings = resolveIngredients(plan.toppings, availableIngredients);
-        const allItems = [carb, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
+        const allItems = [...carbs, protein, ...sauces, ...toppings].filter(Boolean) as Ingredient[];
         const totalProtein = Math.round(allItems.reduce((s, i) => s + i.protein, 0) * 10) / 10;
         const totalCalories = Math.round(allItems.reduce((s, i) => s + i.calories, 0));
 
         return {
           id: `ai-bowl-${Date.now()}-${i}`,
           name: plan.name,
+          mealFormat: plan.mealFormat ?? 'bowl',
           flavorProfile: plan.flavorProfile,
           servings: 2,
-          carbs: carb ? [carb] : [],
+          carbs,
           proteins: protein ? [protein] : [],
           sauces,
           toppings,
@@ -100,7 +101,7 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
 
       {/* Bowl count */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-2">How many bowls?</label>
+        <label className="block text-xs font-medium text-gray-500 mb-2">How many meals?</label>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5, 6, 7].map(n => (
             <button
@@ -181,7 +182,7 @@ export default function WeekPlannerAssistant({ availableIngredients, existingPla
         disabled={loading}
         className="w-full py-2.5 text-sm font-semibold bg-bowl-green text-white rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors"
       >
-        {loading ? 'Planning your week…' : `Generate ${count} bowl${count !== 1 ? 's' : ''}`}
+        {loading ? 'Planning your week…' : `Generate ${count} meal${count !== 1 ? 's' : ''}`}
       </button>
     </div>
   );

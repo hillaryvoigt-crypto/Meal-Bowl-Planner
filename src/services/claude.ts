@@ -1,4 +1,4 @@
-import type { Ingredient, FlavorProfile } from '../types';
+import type { Ingredient, FlavorProfile, MealFormat } from '../types';
 
 type MessageParam = {
   model: string;
@@ -120,9 +120,10 @@ Respond ONLY with valid JSON matching exactly:
 
 export interface BowlPlanItem {
   name: string;
+  mealFormat: MealFormat;
   flavorProfile: FlavorProfile;
   servings: 2;
-  carb: string | null;
+  carbs: string[];
   protein: string | null;
   sauces: string[];
   toppings: string[];
@@ -140,8 +141,17 @@ export async function planWeek(params: {
       .map(i => i.name)
       .join(', ');
 
+  // Group base ingredients by their suggestedFor format
+  const carbsByFormat = (['bowl', 'soup', 'pasta', 'stir-fry', 'curry'] as MealFormat[]).map(fmt => {
+    const names = params.availableIngredients
+      .filter(i => i.category === 'carb' && (!i.suggestedFor || i.suggestedFor.includes(fmt)))
+      .map(i => i.name)
+      .join(', ');
+    return `  ${fmt}: ${names}`;
+  }).join('\n');
+
   const ingredientMenu = [
-    `Carbs: ${byCategory('carb')}`,
+    `Base ingredients (grouped by meal format — pick the right ones for the format you choose):\n${carbsByFormat}`,
     `Proteins: ${byCategory('protein')}`,
     `Sauces: ${byCategory('sauce')}`,
     `Fruits & Veggies: ${byCategory('fruit_veg')}`,
@@ -167,18 +177,20 @@ export async function planWeek(params: {
     system: [
       {
         type: 'text',
-        text: `You are a meal bowl planning assistant. Plan a varied, cost-conscious week of bowls for a shopper at Trader Joe's.
+        text: `You are a meal planning assistant. Plan a varied, cost-conscious week of meals for a shopper at Trader Joe's.
 
 Rules:
 - Only use ingredient names EXACTLY as listed in the menu below.
-- Vary proteins across bowls (no same protein twice unless unavoidable).
-- Vary flavor profiles across bowls.
-- Reuse non-meat perishables across bowls to minimize waste — e.g. use the same feta, goat cheese, or fresh herb in 2 bowls since those packages last.
-- For raw meat and fish (chicken, beef, salmon, shrimp, ground turkey, steak), do NOT plan the same protein across multiple bowls. The user cooks the whole package at once and handles leftovers themselves.
+- Vary BOTH proteins AND meal formats across the week — mix bowls, soups, pasta dishes, stir-fries, and curries.
+- mealFormat must be one of: bowl, soup, pasta, stir-fry, curry.
+- Choose base ingredients that match the mealFormat (e.g. broth for soup, spaghetti for pasta, rice for bowl/stir-fry, coconut milk for curry). Soups and curries can have 2 bases (e.g. broth + orzo, or coconut milk + rice noodles) — set carbs to an array.
+- Vary flavor profiles across meals.
+- Reuse non-meat perishables across meals to minimize waste — e.g. use the same feta, goat cheese, or fresh herb in 2 meals since those packages last.
+- For raw meat and fish (chicken, beef, salmon, shrimp, ground turkey, steak), do NOT plan the same protein across multiple meals. The user cooks the whole package at once and handles leftovers themselves.
 - Mix plant-based and meat proteins for cost balance (steak/shrimp max once per week).
-- Each bowl: 1 carb, 1 protein, 1–2 sauces, 2–5 toppings from fruit_veg/nuts_seeds/cheese/finishing/marinade.
+- Each meal: 1–2 bases (matching the format), 1 protein, 1–2 sauces, 2–5 toppings from fruit_veg/nuts_seeds/cheese/finishing/marinade.
 - flavorProfile must be one of: Mexican, Asian, Mediterranean, Greek, Indian, American, Japanese, Thai, Middle Eastern, Mixed.
-- Respond ONLY with a valid JSON array of bowl objects.
+- Respond ONLY with a valid JSON array of meal objects.
 
 Ingredient menu:
 ${ingredientMenu}`,
@@ -188,10 +200,10 @@ ${ingredientMenu}`,
     messages: [
       {
         role: 'user',
-        content: `Plan ${params.count} bowls for this week. ${existingSummary}${prefBlock}
+        content: `Plan ${params.count} meals for this week. ${existingSummary}${prefBlock}
 
 Respond with a JSON array only, no other text:
-[{"name": string, "flavorProfile": string, "servings": 2, "carb": string|null, "protein": string|null, "sauces": string[], "toppings": string[]}, ...]`,
+[{"name": string, "mealFormat": "bowl"|"soup"|"pasta"|"stir-fry"|"curry", "flavorProfile": string, "servings": 2, "carbs": string[], "protein": string|null, "sauces": string[], "toppings": string[]}, ...]`,
       },
     ],
   });

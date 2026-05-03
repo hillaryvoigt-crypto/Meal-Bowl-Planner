@@ -38,7 +38,7 @@ export default function WeekPlanner({ weekPlan, allIngredients, hasApiKey, onRem
           {/* Bowl cards */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">This Week's Bowls</h2>
+              <h2 className="font-semibold text-gray-900">This Week's Meals</h2>
               <button
                 onClick={onClearWeek}
                 className="text-xs text-red-400 hover:text-red-600 transition-colors"
